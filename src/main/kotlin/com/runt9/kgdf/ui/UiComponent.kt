@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Actor
 import ktx.scene2d.KWidget
 import ktx.scene2d.Scene2dDsl
 import ktx.scene2d.actor
-import com.runt9.kgdf.config.Injector
+import com.runt9.kgdf.inject.Injector
 import com.runt9.kgdf.ui.controller.Controller
 import com.runt9.kgdf.ui.view.View
 

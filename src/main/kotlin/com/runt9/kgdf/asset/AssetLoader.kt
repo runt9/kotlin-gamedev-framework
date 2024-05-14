@@ -9,7 +9,6 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import ktx.assets.async.AssetStorage
 import ktx.async.KtxAsync
-import ktx.log.logger
 
 class AssetLoader(
     private val assets: AssetStorage,
@@ -20,8 +19,7 @@ class AssetLoader(
 
     fun load() = KtxAsync.launch(assetConfig.asyncContext) {
         logger.info { "Loading assets" }
-        // TODO: Need a way for the application to "register" the definition entries
-        val assetsToLoad = TextureDefinition.entries.map { assets.loadAsync<Texture>(it.assetFile) }
+        val assetsToLoad = TextureRegistry.textures.map { assets.loadAsync<Texture>(it.assetFile) }
         assetsToLoad.joinAll()
         logger.info { "Asset loading complete" }
         eventBus.enqueueEvent(AssetsLoadedEvent())

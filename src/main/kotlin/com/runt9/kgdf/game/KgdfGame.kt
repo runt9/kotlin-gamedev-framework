@@ -52,9 +52,9 @@ abstract class KgdfGame : KtxGame<KtxScreen>() {
         setScreen(event.screenClass.java)
     }
 
-    @HandlesEvent
+    @HandlesEvent(ExitRequest::class)
     @Suppress("UnusedPrivateMember")
-    fun handleExit(event: ExitRequest) {
+    fun handleExit() {
         app.exit()
     }
 
