@@ -1,0 +1,25 @@
+  formatting:
+    MaximumLineLength:
+      maxLineLength: 160
+      excludes: ['**/test/**']
+    ArgumentListWrapping:
+      maxLineLength: 160
+    ParameterListWrapping:
+      maxLineLength: 160
+    FinalNewline:
+      active: false
+
+  style:
+    ForbiddenComment:
+      active: false
+    MagicNumber:
+      active: false
+    MaxLineLength:
+      maxLineLength: 160
+      excludes: ['**/test/**']
+    NewLineAtEndOfFile:
+      active: false
+
+  performance:
+    SpreadOperator:
+      active: false
