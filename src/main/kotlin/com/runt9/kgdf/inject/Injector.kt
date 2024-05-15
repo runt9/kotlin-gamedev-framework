@@ -2,13 +2,19 @@ package com.runt9.kgdf.inject
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.ai.GdxAI
 import com.runt9.kgdf.application.ApplicationConfiguration
 import com.runt9.kgdf.application.ApplicationInitializer
 import com.runt9.kgdf.asset.AssetConfig
 import com.runt9.kgdf.asset.AssetLoader
 import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.event.EventBus
+import com.runt9.kgdf.service.GameInitializer
+import com.runt9.kgdf.service.GameServiceRegistry
+import com.runt9.kgdf.service.GameStateService
+import com.runt9.kgdf.service.RandomizerService
 import com.runt9.kgdf.settings.PlayerSettingsConfig
+import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
 import ktx.inject.register
 
@@ -28,8 +34,7 @@ object Injector : Context() {
         bindSingleton<AssetLoader>()
         bindSingleton<ApplicationInitializer>()
 
-
-        additionalDependencies.forEach { it.initStartupDeps(this) }
+        additionalDependencies.initStartupDeps(this)
     }
 
     fun initGdxDeps() = register {
@@ -44,8 +49,21 @@ object Injector : Context() {
 
     fun initRunningDeps() = register {
         bindSingleton(InputMultiplexer())
+        bindSingleton(GdxAI.getTimepiece())
 
-        additionalDependencies.forEach { it.initRunningDeps(this) }
+        bindSingleton<GameServiceRegistry>()
+        bindSingleton<GameStateService>()
+        bindSingleton<RandomizerService>()
+
+        additionalDependencies.initServiceDeps(this)
+
+        bindSingleton<GameInitializer>()
+
+        bindSingleton<DialogManager>()
+
+        additionalDependencies.initControllerDeps(this)
+        additionalDependencies.initOtherRunningDeps(this)
     }
-
 }
+
+

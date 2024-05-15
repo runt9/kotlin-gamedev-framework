@@ -53,11 +53,9 @@ abstract class KgdfGame : KtxGame<KtxScreen>() {
     }
 
     @HandlesEvent(ExitRequest::class)
-    @Suppress("UnusedPrivateMember")
     fun handleExit() {
         app.exit()
     }
 
-    private inline fun <reified S : BasicScreen> addScreen() = addScreen(inject<S>())
-
+    protected inline fun <reified S : BasicScreen> addScreen() = addScreen(inject<S>())
 }

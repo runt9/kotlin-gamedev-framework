@@ -6,4 +6,6 @@ object TextureRegistry {
     fun registerTexture(textureDefinition: TextureDefinition) {
         textures += textureDefinition
     }
+
+    fun registerTextures(textures: Collection<TextureDefinition>) = textures.forEach { registerTexture(it) }
 }

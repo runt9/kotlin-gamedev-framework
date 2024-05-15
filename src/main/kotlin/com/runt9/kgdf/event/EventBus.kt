@@ -1,16 +1,19 @@
+@file:OptIn(DelicateCoroutinesApi::class)
+
 package com.runt9.kgdf.event
 
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.ext.logger
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
 import ktx.async.newSingleThreadAsyncContext
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
-import kotlin.reflect.full.declaredMembers
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.jvmErasure
 
@@ -24,6 +27,7 @@ class EventBus : Disposable {
     private val handlerClasses = mutableSetOf<ClassHandlerMapping>()
 
     suspend fun <T : Event> enqueueEvent(event: T) {
+        logger.debug { "Enqueuing event $event" }
         if (!eventQueue.isClosedForSend) {
             eventQueue.send(event)
         }
@@ -61,6 +65,7 @@ class EventBus : Disposable {
             while (!eventQueue.isClosedForReceive) {
                 eventQueue.receiveCatching().apply {
                     if (isFailure) {
+                        logger.error { "An error occurred while receiving event from queue. ${this.exceptionOrNull()}" }
                         return@launch
                     }
 
@@ -71,6 +76,7 @@ class EventBus : Disposable {
                     }
                 }
             }
+            logger.info { "Loop complete." }
         }
     }
 
@@ -88,7 +94,7 @@ class EventBus : Disposable {
         init {
             val handlers = mutableMapOf<KClass<out Event>, EventHandler<Event>>()
 
-            obj::class.declaredMembers.filter { it.hasAnnotation<HandlesEvent>() }.forEach { fn ->
+            obj::class.memberFunctions.filter { it.hasAnnotation<HandlesEvent>() }.forEach { fn ->
                 val params = fn.valueParameters
 
                 if (params.isEmpty()) {
@@ -100,7 +106,7 @@ class EventBus : Disposable {
                 }
             }
 
-//            logger.debug { "Found ${handlers.size} event handlers in ${obj::class.simpleName}" }
+            logger.debug { "Found ${handlers.size} event handlers in ${obj::class.simpleName}" }
             this.handlers = handlers.toMap()
         }
 
