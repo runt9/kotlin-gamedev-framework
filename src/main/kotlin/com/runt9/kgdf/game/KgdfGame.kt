@@ -12,7 +12,7 @@ import com.runt9.kgdf.ext.inject
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.ext.logger
 import com.runt9.kgdf.inject.Injector
-import com.runt9.kgdf.ui.core.BasicScreen
+import com.runt9.kgdf.ui.core.UiScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 import ktx.async.onRenderingThread
@@ -57,5 +57,5 @@ abstract class KgdfGame : KtxGame<KtxScreen>() {
         app.exit()
     }
 
-    protected inline fun <reified S : BasicScreen> addScreen() = addScreen(inject<S>())
+    protected inline fun <reified S : UiScreen> addScreen() = addScreen(inject<S>())
 }

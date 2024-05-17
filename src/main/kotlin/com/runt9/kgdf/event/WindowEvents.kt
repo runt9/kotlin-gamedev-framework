@@ -1,12 +1,12 @@
 package com.runt9.kgdf.event
 
 import com.runt9.kgdf.ui.controller.DialogController
-import com.runt9.kgdf.ui.core.BasicScreen
+import com.runt9.kgdf.ui.core.UiScreen
 import kotlin.reflect.KClass
 
-class ChangeScreenRequest<S : BasicScreen>(val screenClass: KClass<S>) : Event
-inline fun <reified S : BasicScreen> changeScreenRequest() = ChangeScreenRequest(S::class)
-inline fun <reified S : BasicScreen> EventBus.enqueueChangeScreen() = enqueueEventSync(changeScreenRequest<S>())
+class ChangeScreenRequest<S : UiScreen>(val screenClass: KClass<S>) : Event
+inline fun <reified S : UiScreen> changeScreenRequest() = ChangeScreenRequest(S::class)
+inline fun <reified S : UiScreen> EventBus.enqueueChangeScreen() = enqueueEventSync(changeScreenRequest<S>())
 
 class ShowDialogRequest<D : DialogController>(val dialogClass: KClass<D>, vararg val data: Any) : Event
 inline fun <reified D : DialogController> showDialogRequest(vararg data: Any) = ShowDialogRequest(D::class, *data)
