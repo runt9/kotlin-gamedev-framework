@@ -12,7 +12,7 @@ class Logger(name: String) : ktx.log.Logger(name) {
     }
 }
 
-fun logger(): Logger {
+fun kgdfLogger(): Logger {
     val caller = Thread.currentThread().stackTrace[2]
     return Logger(Class.forName(caller.className).simpleName)
 }

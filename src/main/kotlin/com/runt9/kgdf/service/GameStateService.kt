@@ -4,11 +4,11 @@ package com.runt9.kgdf.service
 
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.GameStateUpdated
-import com.runt9.kgdf.ext.logger
+import com.runt9.kgdf.ext.kgdfLogger
 import com.runt9.kgdf.game.GameState
 
 class GameStateService(private val eventBus: EventBus, registry: GameServiceRegistry) : GameService(eventBus, registry) {
-    private val logger = logger()
+    private val logger = kgdfLogger()
     private lateinit var gameState: GameState
 
     // TODO: This should probably jump into the service thread to load but the caller expects things to be synchronous

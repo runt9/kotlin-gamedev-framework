@@ -10,7 +10,7 @@ import com.runt9.kgdf.event.ExitRequest
 import com.runt9.kgdf.event.HandlesEvent
 import com.runt9.kgdf.ext.inject
 import com.runt9.kgdf.ext.lazyInject
-import com.runt9.kgdf.ext.logger
+import com.runt9.kgdf.ext.kgdfLogger
 import com.runt9.kgdf.inject.Injector
 import com.runt9.kgdf.ui.core.UiScreen
 import ktx.app.KtxGame
@@ -18,7 +18,7 @@ import ktx.app.KtxScreen
 import ktx.async.onRenderingThread
 
 abstract class KgdfGame : KtxGame<KtxScreen>() {
-    private val logger = logger()
+    private val logger = kgdfLogger()
     private val initializer by lazyInject<ApplicationInitializer>()
     private val input by lazyInject<Input>()
     private val eventBus by lazyInject<EventBus>()

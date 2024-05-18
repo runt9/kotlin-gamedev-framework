@@ -3,7 +3,7 @@
 package com.runt9.kgdf.event
 
 import com.badlogic.gdx.utils.Disposable
-import com.runt9.kgdf.ext.logger
+import com.runt9.kgdf.ext.kgdfLogger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
@@ -20,7 +20,7 @@ import kotlin.reflect.jvm.jvmErasure
 
 @Suppress("UNCHECKED_CAST")
 class EventBus : Disposable {
-    private val logger = logger()
+    private val logger = kgdfLogger()
     private val asyncContext = newSingleThreadAsyncContext("Event-Thread")
     private val eventQueue = Channel<Event>()
     private val eventHandlers = mutableMapOf<KClass<out Event>, MutableList<EventHandler<Event>>>()

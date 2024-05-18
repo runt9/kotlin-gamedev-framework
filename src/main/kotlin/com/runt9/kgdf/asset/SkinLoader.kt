@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.kotcrab.vis.ui.VisUI
-import com.runt9.kgdf.ext.logger
+import com.runt9.kgdf.ext.kgdfLogger
 import com.runt9.kgdf.inject.Injector
 import ktx.assets.async.AssetStorage
 import ktx.collections.gdxMapOf
@@ -14,7 +14,7 @@ import ktx.freetype.generateFont
 import ktx.scene2d.Scene2DSkin
 
 class SkinLoader(private val assetStorage: AssetStorage) {
-    private val logger = logger()
+    private val logger = kgdfLogger()
 
     // TODO: Configurable skin
 

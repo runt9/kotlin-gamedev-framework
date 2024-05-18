@@ -14,7 +14,7 @@ abstract class InjectorDependencies {
     protected open fun Context.initOtherRunningDepsInternal() {}
 }
 
-typealias AdditionalInjectorDependencies = MutableList<InjectorDependencies>
+typealias AdditionalInjectorDependencies = Collection<InjectorDependencies>
 fun AdditionalInjectorDependencies.initStartupDeps(ctx: Context) = forEach { it.initStartupDeps(ctx) }
 fun AdditionalInjectorDependencies.initServiceDeps(ctx: Context) = forEach { it.initServiceDeps(ctx) }
 fun AdditionalInjectorDependencies.initControllerDeps(ctx: Context) = forEach { it.initControllerDeps(ctx) }
