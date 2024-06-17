@@ -16,9 +16,6 @@ abstract class UiScreen : BaseScreen {
     override val stages = listOf(uiStage)
     abstract val uiController: Controller
 
-    override fun render(delta: Float) = uiStage.render(delta)
-    override fun dispose() = uiStage.dispose()
-
     override fun show() {
         input.addProcessor(uiStage)
         uiController.load()

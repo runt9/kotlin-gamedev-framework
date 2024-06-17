@@ -10,7 +10,7 @@ import com.runt9.kgdf.ui.controller.Controller
  * can be displayed in whatever grid size is best. If a GameCameraController is supplied, will connect that in to receive updates on render.
  */
 abstract class GameScreen(worldWidth: Float, worldHeight: Float) : UiScreen() {
-    private val camera = OrthographicCamera(worldWidth, worldHeight)
+    protected val camera = OrthographicCamera(worldWidth, worldHeight)
     protected val gameStage: BasicStage = BasicStage(FitViewport(worldWidth, worldHeight, camera))
     override val stages = listOf(gameStage, uiStage)
     abstract val gameController: Controller
@@ -38,5 +38,5 @@ abstract class GameScreen(worldWidth: Float, worldHeight: Float) : UiScreen() {
     }
 
     // Default to null as no camera is required to be supplied. But can be overridden if necessary.
-    fun getCameraController(): GameCameraController? = null
+    open fun getCameraController(): GameCameraController? = null
 }

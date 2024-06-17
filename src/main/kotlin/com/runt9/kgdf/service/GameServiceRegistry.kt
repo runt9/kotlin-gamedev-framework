@@ -11,5 +11,6 @@ class GameServiceRegistry : Disposable {
 
     fun startAll() = registry.forEach(GameService::start)
     fun stopAll() = registry.forEach(GameService::stop)
+    fun tickAll(delta: Float) = registry.forEach { s -> s.tick(delta) }
     override fun dispose() = registry.forEach(Disposable::dispose)
 }

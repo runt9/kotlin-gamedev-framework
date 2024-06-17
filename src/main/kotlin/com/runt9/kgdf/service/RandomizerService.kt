@@ -32,6 +32,6 @@ class RandomizerService(private val gameStateService: GameStateService, eventBus
         range.random(it)
     }
 
-    fun <T> fromList(list: List<T>) = list.random(rng)
-    fun <T : Comparable<T>> fromList(list: List<T>, lucky: Boolean = false) = randomize(lucky) { list.random(it) }
+    fun <T> fromCollection(list: Collection<T>) = list.random(rng)
+    fun <T : Comparable<T>> fromCollection(list: Collection<T>, lucky: Boolean = false) = randomize(lucky) { list.random(it) }
 }

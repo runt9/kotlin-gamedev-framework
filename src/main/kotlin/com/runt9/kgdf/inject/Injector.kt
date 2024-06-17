@@ -18,6 +18,8 @@ import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
 import ktx.inject.register
 
+// TODO: Might be a good idea, instead of injecting everything, to instead have the list of dependencies that can be injected and removed
+//  from the context, making it easier to fully inject then fully tear-down everything in the Game state
 object Injector : Context() {
     private val additionalDependencies = mutableListOf<InjectorDependencies>()
 

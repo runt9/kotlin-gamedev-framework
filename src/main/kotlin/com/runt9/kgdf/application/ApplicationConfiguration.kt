@@ -10,7 +10,7 @@ class ApplicationConfiguration(settingsConfig: PlayerSettingsConfig) : Lwjgl3App
     init {
         val settings = settingsConfig.get()
         // TODO: Configurable title
-        setTitle("Autochess Slot Machine")
+        setTitle("AutoHack")
         handleResolution(settings.fullscreen, settings.resolution)
         useVsync(settings.vsync)
         setResizable(false)
