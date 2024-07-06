@@ -7,4 +7,3 @@ data class PlayerSettings(val fullscreen: Boolean, val vsync: Boolean, val logLe
     @Serializable
     data class Resolution(val width: Int, val height: Int)
 }
-
