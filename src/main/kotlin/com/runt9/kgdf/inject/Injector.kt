@@ -11,8 +11,6 @@ import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
-import com.runt9.kgdf.service.GameStateService
-import com.runt9.kgdf.service.RandomizerService
 import com.runt9.kgdf.settings.PlayerSettingsConfig
 import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
@@ -54,13 +52,10 @@ object Injector : Context() {
         bindSingleton(GdxAI.getTimepiece())
 
         bindSingleton<GameServiceRegistry>()
-        bindSingleton<GameStateService>()
-        bindSingleton<RandomizerService>()
 
         additionalDependencies.initServiceDeps(this)
 
         bindSingleton<GameInitializer>()
-
         bindSingleton<DialogManager>()
 
         additionalDependencies.initControllerDeps(this)

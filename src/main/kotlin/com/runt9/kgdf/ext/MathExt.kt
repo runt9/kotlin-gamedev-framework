@@ -24,6 +24,11 @@ fun Float.displayDecimal(decimals: Int = 2) = "%.${decimals}f".format(this)
 fun Float.displayMultiplier(decimals: Int = 2) = "${displayDecimal(decimals)}x"
 fun Float.displayPercent(decimals: Int = 1) = "${(this * 100f).displayDecimal(decimals)}%"
 
+fun Double.displayInt() = roundToInt().toString()
+fun Double.displayDecimal(decimals: Int = 2) = "%.${decimals}f".format(this)
+fun Double.displayMultiplier(decimals: Int = 2) = "${displayDecimal(decimals)}x"
+fun Double.displayPercent(decimals: Int = 1) = "${(this * 100f).displayDecimal(decimals)}%"
+
 fun Float.clamp(min: Float? = null, max: Float? = null) = when {
     min != null && min > this -> min
     max != null && max < this -> max
