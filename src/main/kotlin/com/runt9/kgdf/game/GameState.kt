@@ -1,10 +1,9 @@
 package com.runt9.kgdf.game
 
+import com.runt9.kgdf.util.SeededRandomizer
+
 interface GameState {
-    /**
-     * Used to seed randomizer.
-     */
-    val seed: String
+    val rng: SeededRandomizer
 
     fun clone(): GameState
 }
