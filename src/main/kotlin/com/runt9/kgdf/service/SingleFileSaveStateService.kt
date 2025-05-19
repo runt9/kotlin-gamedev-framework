@@ -35,14 +35,14 @@ abstract class SingleFileSaveStateService<T : Any>(
     private fun stateFileHandle() = Lwjgl3FileHandle(savesDir.resolve(filename).toFile(), Files.FileType.Absolute)
 
     fun saveState(saveState: T) {
-        logger.info { "Saving save state" }
+        logger.debug { "Saving save state" }
         val saveFile = stateFileHandle()
 //        saveFile.writeBytes(protobuf.encodeToByteArray(stateType.serializer(), saveState), false)
         saveFile.writeString(json.encodeToString(stateType.serializer(), saveState), false)
     }
 
     fun loadState(): T {
-        logger.info { "Loading save state" }
+        logger.debug { "Loading save state" }
         val saveFile = stateFileHandle()
 //        return protobuf.decodeFromByteArray(stateType.serializer(), saveFile.readBytes())
         return json.decodeFromStream(stateType.serializer(), saveFile.read())
@@ -53,7 +53,7 @@ abstract class SingleFileSaveStateService<T : Any>(
         return fileHandle.exists() && fileHandle.readString().isNotEmpty()
     }
     fun clearSavedFile(): Boolean {
-        logger.info { "Clearing saved file" }
+        logger.debug { "Clearing saved file" }
         // TODO: Hacky workaround for file not getting deleted sometimes
         stateFileHandle().writeString("", false)
         return stateFileHandle().delete()

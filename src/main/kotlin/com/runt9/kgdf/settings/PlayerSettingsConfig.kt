@@ -69,7 +69,7 @@ class PlayerSettingsConfig(gameConfig: GameConfig) {
             fullscreen = false,
             vsync = true,
             logLevel = LOG_ERROR,
-            resolution = PlayerSettings.Resolution(primaryDisplayMode.width, primaryDisplayMode.height)
+            resolution = PlayerSettings.Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate),
         )
         save(settings)
         this.settings = settings

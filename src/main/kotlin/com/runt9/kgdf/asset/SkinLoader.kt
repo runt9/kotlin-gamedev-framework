@@ -36,6 +36,11 @@ class SkinLoader(private val assetStorage: AssetStorage) {
         logger.info { "Skin initialization complete" }
     }
 
+    fun generateFont(parameters: FreeTypeFontGenerator.FreeTypeFontParameter.() -> Unit): BitmapFont {
+        val fontGen = assetStorage.loadSync<FreeTypeFontGenerator>("skin/Roboto-Medium.ttf")
+        return fontGen.generateFont(parameters)
+    }
+
     private fun FreeTypeFontGenerator.buttonFont() = generateFont {
         size = 16
         spaceX = 2
