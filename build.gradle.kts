@@ -51,6 +51,7 @@ dependencies {
     apiGdxNative("gdx-platform", "gdx-freetype-platform")
     api("com.badlogicgames.gdx:gdx-ai:$gdxAiVersion")
     apiKorlibs("klock")
+    api("com.github.raeleus.stripe:freetype:2.0.0")
 
     apiKtx(
         "app",
