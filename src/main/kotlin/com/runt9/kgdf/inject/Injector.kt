@@ -8,6 +8,7 @@ import com.runt9.kgdf.application.ApplicationInitializer
 import com.runt9.kgdf.asset.AssetConfig
 import com.runt9.kgdf.asset.AssetLoader
 import com.runt9.kgdf.asset.SkinLoader
+import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
@@ -52,6 +53,7 @@ object Injector : Context() {
         bindSingleton(GdxAI.getTimepiece())
 
         bindSingleton<GameServiceRegistry>()
+        bindSingleton<SoundService>()
 
         additionalDependencies.initServiceDeps(this)
 

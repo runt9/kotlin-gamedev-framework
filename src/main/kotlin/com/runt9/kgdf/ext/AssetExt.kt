@@ -1,7 +1,9 @@
 package com.runt9.kgdf.ext
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
-import com.runt9.kgdf.asset.TextureDefinition
+import com.runt9.kgdf.asset.AssetDefinition
 import ktx.assets.async.AssetStorage
 
-fun AssetStorage.loadTexture(def: TextureDefinition): Texture = this[def.assetFile]
+fun AssetStorage.loadTexture(def: AssetDefinition): Texture = this[def.assetFile]
+fun AssetStorage.loadSound(def: AssetDefinition): Sound = this[def.assetFile]

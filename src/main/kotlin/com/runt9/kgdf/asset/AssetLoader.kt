@@ -1,5 +1,6 @@
 package com.runt9.kgdf.asset
 
+import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.event.AssetsLoadedEvent
@@ -19,7 +20,12 @@ class AssetLoader(
 
     fun load() = KtxAsync.launch(assetConfig.asyncContext) {
         logger.info { "Loading assets" }
-        val assetsToLoad = TextureRegistry.textures.map { assets.loadAsync<Texture>(it.assetFile) }
+        val assetsToLoad = AssetRegistry.assets.map {
+            when (it.type) {
+                AssetDefinition.AssetType.TEXTURE -> assets.loadAsync<Texture>(it.assetFile)
+                AssetDefinition.AssetType.SOUND -> assets.loadAsync<Sound>(it.assetFile)
+            }
+        }
         assetsToLoad.joinAll()
         logger.info { "Asset loading complete" }
         eventBus.enqueueEvent(AssetsLoadedEvent())
