@@ -9,8 +9,8 @@ import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.ExitRequest
 import com.runt9.kgdf.event.HandlesEvent
 import com.runt9.kgdf.ext.inject
-import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.inject.Injector
 import com.runt9.kgdf.ui.core.UiScreen
 import ktx.app.KtxGame

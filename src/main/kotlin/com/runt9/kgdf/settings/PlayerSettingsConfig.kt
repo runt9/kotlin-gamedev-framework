@@ -2,10 +2,10 @@ package com.runt9.kgdf.settings
 
 import com.badlogic.gdx.Application.LOG_ERROR
 import com.badlogic.gdx.Files
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle
-import com.runt9.kgdf.ext.getMatching
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.game.GameConfig
 import kotlinx.serialization.encodeToString
@@ -52,8 +52,11 @@ class PlayerSettingsConfig(gameConfig: GameConfig) {
     // TODO: This is the same as ApplicationConfiguration but different due to no overlapping interface
     private fun PlayerSettings.applyResolution() {
         if (fullscreen) {
-            graphics.setFullscreenMode(graphics.displayModes.getMatching(resolution, graphics.displayMode))
+            graphics.setUndecorated(true)
+            val displayMode = Gdx.graphics.displayMode
+            graphics.setWindowedMode(displayMode.width, displayMode.height)
         } else {
+            graphics.setUndecorated(false)
             resolution.apply { graphics.setWindowedMode(width, height) }
         }
     }
