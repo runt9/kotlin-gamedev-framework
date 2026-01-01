@@ -7,9 +7,8 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle
 import com.runt9.kgdf.ext.kgdfLogger
 import com.runt9.kgdf.game.GameConfig
 import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.cbor.Cbor
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
-import kotlinx.serialization.protobuf.ProtoBuf
 import kotlinx.serialization.serializer
 import kotlin.reflect.KClass
 
@@ -24,8 +23,10 @@ abstract class SingleFileSaveStateService<T : Any>(
     private val filename: String = SAVED_RUN_FILE
 ) {
     private val logger = kgdfLogger()
-    // TODO: Protobuf isn't a "safe" format so people could easily modify their saves.
-    private val protobuf = ProtoBuf {}
+    private val cbor = Cbor {
+        encodeDefaults = true
+        ignoreUnknownKeys = true
+    }
     private val json = Json {
         prettyPrint = true
         allowStructuredMapKeys = true
@@ -37,15 +38,15 @@ abstract class SingleFileSaveStateService<T : Any>(
     fun saveState(saveState: T) {
         logger.debug { "Saving save state" }
         val saveFile = stateFileHandle()
-//        saveFile.writeBytes(protobuf.encodeToByteArray(stateType.serializer(), saveState), false)
-        saveFile.writeString(json.encodeToString(stateType.serializer(), saveState), false)
+        saveFile.writeBytes(cbor.encodeToByteArray(stateType.serializer(), saveState), false)
+//        saveFile.writeString(json.encodeToString(stateType.serializer(), saveState), false)
     }
 
     fun loadState(): T {
         logger.debug { "Loading save state" }
         val saveFile = stateFileHandle()
-//        return protobuf.decodeFromByteArray(stateType.serializer(), saveFile.readBytes())
-        return json.decodeFromStream(stateType.serializer(), saveFile.read())
+        return cbor.decodeFromByteArray(stateType.serializer(), saveFile.readBytes())
+//        return json.decodeFromStream(stateType.serializer(), saveFile.read())
     }
 
     fun hasSavedFile(): Boolean {

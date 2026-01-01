@@ -46,7 +46,7 @@ fun DependencyHandlerScope.apiKorlibs(vararg names: String) =
 
 dependencies {
     apiKotlin("stdlib", "reflect")
-    apiKotlinx("serialization-json" to kotlinSerializationVersion, "serialization-protobuf" to kotlinSerializationVersion, "coroutines-core" to kotlinCoroutinesVersion)
+    apiKotlinx("serialization-json" to kotlinSerializationVersion, "serialization-cbor" to kotlinSerializationVersion, "coroutines-core" to kotlinCoroutinesVersion)
     apiGdx("gdx", "gdx-freetype", "gdx-backend-lwjgl3")
     apiGdxNative("gdx-platform", "gdx-freetype-platform")
     api("com.badlogicgames.gdx:gdx-ai:$gdxAiVersion")
