@@ -2,6 +2,8 @@ package com.runt9.kgdf.log
 
 import korlibs.time.DateFormat
 import korlibs.time.DateTimeTz
+import java.nio.file.Files
+import java.nio.file.Path
 
 
 class Logger(name: String) : ktx.log.Logger(name) {
@@ -15,4 +17,10 @@ class Logger(name: String) : ktx.log.Logger(name) {
 fun kgdfLogger(): Logger {
     val caller = Thread.currentThread().stackTrace[2]
     return Logger(Class.forName(caller.className).simpleName)
+}
+
+fun teeStderrToFile(filePath: Path) {
+    Files.createDirectories(filePath.parent)
+    val teePs = TeePrintStream(System.err, filePath.fileName.toString())
+    System.setErr(teePs)
 }
