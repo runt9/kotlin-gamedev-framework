@@ -21,6 +21,6 @@ fun kgdfLogger(): Logger {
 
 fun teeStderrToFile(filePath: Path) {
     Files.createDirectories(filePath.parent)
-    val teePs = TeePrintStream(System.err, filePath.fileName.toString())
+    val teePs = TeePrintStream(System.err, filePath.toString())
     System.setErr(teePs)
 }
