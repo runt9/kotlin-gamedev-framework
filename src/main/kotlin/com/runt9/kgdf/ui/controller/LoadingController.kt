@@ -3,7 +3,7 @@ package com.runt9.kgdf.ui.controller
 import com.runt9.kgdf.event.AssetsLoadedEvent
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.HandlesEvent
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ext.percent
 import com.runt9.kgdf.ui.viewModel.LoadingViewModel
 import ktx.assets.async.AssetStorage

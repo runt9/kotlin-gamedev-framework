@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.event.AssetsLoadedEvent
 import com.runt9.kgdf.event.EventBus
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import ktx.assets.async.AssetStorage

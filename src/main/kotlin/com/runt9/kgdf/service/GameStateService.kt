@@ -4,7 +4,7 @@ package com.runt9.kgdf.service
 
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.GameStateUpdated
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.game.GameState
 
 abstract class GameStateService<T : GameState>(

@@ -1,6 +1,7 @@
 package com.runt9.kgdf.game
 
 import com.badlogic.gdx.Application
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Input
 import com.badlogic.gdx.InputMultiplexer
 import com.runt9.kgdf.application.ApplicationInitializer
@@ -9,9 +10,10 @@ import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.ExitRequest
 import com.runt9.kgdf.event.HandlesEvent
 import com.runt9.kgdf.ext.inject
-import com.runt9.kgdf.ext.kgdfLogger
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.inject.Injector
+import com.runt9.kgdf.log.KotlinLoggingLogger
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ui.core.UiScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
@@ -25,6 +27,7 @@ abstract class KgdfGame : KtxGame<KtxScreen>() {
     private val app by lazyInject<Application>()
 
     override fun create() {
+        Gdx.app.applicationLogger = KotlinLoggingLogger()
         initializer.initialize()
 
         Injector.initGdxDeps()

@@ -4,7 +4,7 @@ import com.badlogic.gdx.assets.AssetDescriptor
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.kotcrab.vis.ui.VisUI
 import com.ray3k.stripe.FreeTypeSkinLoader
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.inject.Injector
 import ktx.assets.async.AssetStorage
 import ktx.scene2d.Scene2DSkin

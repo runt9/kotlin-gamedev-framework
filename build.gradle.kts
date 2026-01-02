@@ -52,6 +52,9 @@ dependencies {
     api("com.badlogicgames.gdx:gdx-ai:$gdxAiVersion")
     apiKorlibs("klock")
     api("com.github.raeleus.stripe:freetype:2.0.0")
+    api("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    api("org.slf4j:slf4j-api:2.0.17")
+    api("ch.qos.logback:logback-classic:1.5.23")
 
     apiKtx(
         "app",

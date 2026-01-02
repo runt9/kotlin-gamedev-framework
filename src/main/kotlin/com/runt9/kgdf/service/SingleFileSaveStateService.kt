@@ -4,7 +4,7 @@ package com.runt9.kgdf.service
 
 import com.badlogic.gdx.Files
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3FileHandle
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.game.GameConfig
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.cbor.Cbor

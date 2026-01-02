@@ -3,7 +3,7 @@
 package com.runt9.kgdf.event
 
 import com.badlogic.gdx.utils.Disposable
-import com.runt9.kgdf.ext.kgdfLogger
+import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch

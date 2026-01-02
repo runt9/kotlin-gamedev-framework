@@ -1,4 +1,4 @@
-package com.runt9.kgdf.ext
+package com.runt9.kgdf.log
 
 import korlibs.time.DateFormat
 import korlibs.time.DateTimeTz
