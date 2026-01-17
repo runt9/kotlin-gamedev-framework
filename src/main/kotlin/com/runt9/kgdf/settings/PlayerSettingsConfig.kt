@@ -73,7 +73,8 @@ class PlayerSettingsConfig(gameConfig: GameConfig) {
             vsync = true,
             logLevel = LOG_ERROR,
             resolution = PlayerSettings.Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate),
-            mainVolume = 0.2f
+            mainVolume = 0.2f,
+            usageData = true
         )
         save(settings)
         this.settings = settings
