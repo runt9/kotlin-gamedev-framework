@@ -9,7 +9,7 @@ class TeePrintStream(
     private val primary: PrintStream,
     secondary: OutputStream
 ) : PrintStream(secondary, true) {
-    constructor(primary: PrintStream, filename: String) : this(primary, FileOutputStream(filename))
+    constructor(primary: PrintStream, filename: String) : this(primary, FileOutputStream(filename, true))
 
     override fun checkError(): Boolean {
         return primary.checkError() || super.checkError()
