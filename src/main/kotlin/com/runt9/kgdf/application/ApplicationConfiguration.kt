@@ -13,6 +13,7 @@ class ApplicationConfiguration(settingsConfig: PlayerSettingsConfig, gameConfig:
         handleResolution(settings.fullscreen, settings.resolution)
         useVsync(settings.vsync)
         setResizable(false)
+        setWindowIcon(*gameConfig.icons.toTypedArray())
     }
 
     private fun handleResolution(fullscreen: Boolean, resolution: PlayerSettings.Resolution) {
