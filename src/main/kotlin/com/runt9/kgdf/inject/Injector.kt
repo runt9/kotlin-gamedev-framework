@@ -12,7 +12,6 @@ import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
-import com.runt9.kgdf.settings.PlayerSettingsConfig
 import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
 import ktx.inject.register
@@ -27,7 +26,6 @@ object Injector : Context() {
     }
 
     fun initStartupDeps() = register {
-        bindSingleton<PlayerSettingsConfig>()
         bindSingleton<ApplicationConfiguration>()
         bindSingleton<EventBus>()
         bindSingleton<AssetConfig>()
