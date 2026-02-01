@@ -11,7 +11,11 @@ abstract class PlayerSettings {
     abstract val logLevel: Int
     abstract val resolution: Resolution
     abstract val mainVolume: Float
+    abstract val soundVolume: Float
+    abstract val musicVolume: Float
     abstract val usageData: Boolean
+    val combinedSoundVolume get() = mainVolume * soundVolume
+    val combinedMusicVolume get() = mainVolume * musicVolume
 
     @Serializable
     data class Resolution(val width: Int, val height: Int, val refreshRate: Int) {
@@ -27,6 +31,8 @@ abstract class PlayerSettings {
                 override val logLevel = LOG_ERROR
                 override val resolution = Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate)
                 override val mainVolume = 0.2f
+                override val soundVolume = 1f
+                override val musicVolume = 0.75f
                 override val usageData = true
             }
         }

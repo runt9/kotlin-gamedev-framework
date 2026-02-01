@@ -1,5 +1,6 @@
 package com.runt9.kgdf.asset
 
+import com.badlogic.gdx.audio.Music
 import com.badlogic.gdx.audio.Sound
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.utils.Disposable
@@ -24,6 +25,7 @@ class AssetLoader(
             when (it.type) {
                 AssetDefinition.AssetType.TEXTURE -> assets.loadAsync<Texture>(it.assetFile)
                 AssetDefinition.AssetType.SOUND -> assets.loadAsync<Sound>(it.assetFile)
+                AssetDefinition.AssetType.MUSIC -> assets.loadAsync<Music>(it.assetFile)
             }
         }
         assetsToLoad.joinAll()

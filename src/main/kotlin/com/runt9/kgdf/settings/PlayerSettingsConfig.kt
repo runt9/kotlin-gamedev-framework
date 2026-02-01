@@ -2,6 +2,7 @@ package com.runt9.kgdf.settings
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
+import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.ext.lazyInject
 
 const val USER_SETTINGS_FILE = "settings.json"
@@ -9,6 +10,7 @@ const val USER_SETTINGS_FILE = "settings.json"
 // TODO: Backwards-compatibility capabilities for migrating settings files
 class PlayerSettingsConfig(private val store: SettingsStore<*>) {
     private val graphics by lazyInject<Graphics>()
+    private val soundService by lazyInject<SoundService>()
 
     fun get() = store.get()
 
@@ -16,6 +18,7 @@ class PlayerSettingsConfig(private val store: SettingsStore<*>) {
         settings.apply {
             applyResolution()
             graphics.setVSync(settings.vsync)
+            soundService.adjustMusicVolume(combinedMusicVolume)
         }
     }
 
