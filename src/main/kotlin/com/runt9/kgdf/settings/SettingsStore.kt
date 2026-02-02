@@ -12,7 +12,10 @@ abstract class SettingsStore<T : PlayerSettings>(
     private val serializer: KSerializer<T>,
     private val defaultSettings: T
 ) {
-    private val json = Json { prettyPrint = true }
+    private val json = Json {
+        prettyPrint = true
+        ignoreUnknownKeys = true
+    }
     private val settingsDir = gameConfig.gameDataPath
     private val settingsFile by lazy { Lwjgl3FileHandle(settingsDir.resolve(USER_SETTINGS_FILE).toFile(), Files.FileType.Absolute) }
 

@@ -1,6 +1,7 @@
 package com.runt9.kgdf.ui.core
 
 import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.utils.viewport.ExtendViewport
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.ui.DialogManager
 import com.runt9.kgdf.ui.controller.Controller
@@ -9,8 +10,8 @@ import com.runt9.kgdf.ui.controller.Controller
  * Used for UI displays such as menus or part of a GameScreen to display UI elements on the screen while
  * allowing the game to control its own grid.
  */
-abstract class UiScreen : BaseScreen {
-    val uiStage = BasicStage()
+abstract class UiScreen(width: Float, height: Float) : BaseScreen {
+    val uiStage = BasicStage(ExtendViewport(width, height))
     val input by lazyInject<InputMultiplexer>()
     val dialogManager by lazyInject<DialogManager>()
     override val stages = listOf(uiStage)
@@ -28,5 +29,10 @@ abstract class UiScreen : BaseScreen {
         input.removeProcessor(uiStage)
         uiController.dispose()
         dialogManager.currentStage = null
+    }
+
+    override fun resize(width: Int, height: Int) {
+        super.resize(width, height)
+        uiStage.viewport.update(width, height)
     }
 }

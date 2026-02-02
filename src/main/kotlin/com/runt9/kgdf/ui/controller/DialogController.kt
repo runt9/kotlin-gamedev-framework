@@ -5,7 +5,7 @@ import com.runt9.kgdf.ui.view.DialogView
 
 abstract class DialogController : Controller {
     abstract override val view: DialogView
-    private var stage: BasicStage? = null
+    protected var stage: BasicStage? = null
 
     var isShown = false
 
@@ -13,6 +13,7 @@ abstract class DialogController : Controller {
         if (!isShown) {
             load()
             this.stage = stage
+            view.initStage(stage)
             view.show(stage)
             view.init()
             isShown = true

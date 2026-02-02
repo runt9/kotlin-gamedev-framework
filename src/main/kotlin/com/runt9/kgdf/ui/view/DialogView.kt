@@ -2,10 +2,12 @@ package com.runt9.kgdf.ui.view
 
 import com.badlogic.gdx.Graphics
 import com.badlogic.gdx.scenes.scene2d.Actor
+import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisDialog
 import com.runt9.kgdf.ext.inject
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ui.controller.DialogController
 import ktx.scene2d.KTable
 
@@ -13,9 +15,8 @@ abstract class DialogView(override val controller: DialogController, name: Strin
     protected abstract val widthScale: Float
     protected abstract val heightScale: Float
 
+
     val graphics = inject<Graphics>()
-    private val screenWidth = graphics.width
-    private val screenHeight = graphics.height
 
     override fun init() {
         setOrigin(Align.center)
@@ -43,6 +44,17 @@ abstract class DialogView(override val controller: DialogController, name: Strin
         remove()
     }
 
-    override fun getPrefWidth() = screenWidth * widthScale
-    override fun getPrefHeight() = screenHeight * heightScale
+    override fun getPrefWidth(): Float {
+        val viewportWidth = stage?.viewport?.worldWidth ?: graphics.width.toFloat()
+        return viewportWidth * widthScale
+    }
+    override fun getPrefHeight(): Float {
+        val viewportHeight = stage?.viewport?.worldHeight ?: graphics.height.toFloat()
+        return viewportHeight * heightScale
+    }
+
+    fun initStage(stage: Stage) {
+        this.stage = stage
+        pack()
+    }
 }

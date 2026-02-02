@@ -9,7 +9,7 @@ import com.runt9.kgdf.ui.controller.Controller
  * Used to combine both a UI screen and a Game screen together so that UI elements can be displayed in proper resolution but the game
  * can be displayed in whatever grid size is best. If a GameCameraController is supplied, will connect that in to receive updates on render.
  */
-abstract class GameScreen(worldWidth: Float, worldHeight: Float) : UiScreen() {
+abstract class GameScreen(uiWidth: Float, uiHeight: Float, worldWidth: Float, worldHeight: Float) : UiScreen(uiWidth, uiHeight) {
     protected val camera = OrthographicCamera(worldWidth, worldHeight)
     protected val gameStage: BasicStage = BasicStage(FitViewport(worldWidth, worldHeight, camera))
     override val stages = listOf(gameStage, uiStage)

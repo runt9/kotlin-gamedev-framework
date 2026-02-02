@@ -3,13 +3,13 @@ package com.runt9.kgdf.ui.controller
 import com.runt9.kgdf.event.AssetsLoadedEvent
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.HandlesEvent
-import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ext.percent
+import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ui.viewModel.LoadingViewModel
 import ktx.assets.async.AssetStorage
 import ktx.async.onRenderingThread
 
-abstract class LoadingController(private val assets: AssetStorage, private val eventBus: EventBus) : UiScreenController() {
+abstract class LoadingController(width: Float, height: Float, private val assets: AssetStorage, private val eventBus: EventBus) : UiScreenController(width, height) {
     private val logger = kgdfLogger()
     abstract override val vm: LoadingViewModel
 
