@@ -2,6 +2,7 @@ package com.runt9.kgdf.ui.core
 
 import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.utils.viewport.ExtendViewport
+import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.ui.DialogManager
 import com.runt9.kgdf.ui.controller.Controller
@@ -14,6 +15,7 @@ abstract class UiScreen(width: Float, height: Float) : BaseScreen {
     val uiStage = BasicStage(ExtendViewport(width, height))
     val input by lazyInject<InputMultiplexer>()
     val dialogManager by lazyInject<DialogManager>()
+    private val skinLoader by lazyInject<SkinLoader>()
     override val stages = listOf(uiStage)
     abstract val uiController: Controller
 
@@ -34,5 +36,6 @@ abstract class UiScreen(width: Float, height: Float) : BaseScreen {
     override fun resize(width: Int, height: Int) {
         super.resize(width, height)
         uiStage.viewport.update(width, height)
+        skinLoader.regenerateFonts(uiStage)
     }
 }

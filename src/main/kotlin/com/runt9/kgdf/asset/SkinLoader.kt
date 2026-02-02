@@ -32,7 +32,6 @@ class SkinLoader(private val assetStorage: AssetStorage) {
         logger.info { "Initializing skin" }
         assetStorage.setLoader<Skin> { ParameterAvailableFreeTypeSkinLoader(assetStorage.fileResolver) }
         skin = assetStorage.loadSync(AssetDescriptor("skin/uiskin.json", Skin::class.java)) as ParameterAvailableFreeTypeSkin
-        regenerateFonts()
         logger.info { "Skin loading complete, loading VisUI" }
         Injector.bindSingleton { skin }
         VisUI.load(skin)
@@ -41,9 +40,10 @@ class SkinLoader(private val assetStorage: AssetStorage) {
         logger.info { "Skin initialization complete" }
     }
 
-    fun regenerateFonts(stage: Stage? = null) {
+    fun regenerateFonts(stage: Stage) {
         logger.info { "Regenerating fonts" }
         val fontGen = assetStorage.loadSync<FreeTypeFontGenerator>("skin/Roboto-Medium.ttf")
+        val scale = Gdx.graphics.width.toFloat() / (stage.viewport.worldWidth)
 
         // TODO: Refactor and optimize this
         skin.getAll<BitmapFont>()?.forEach { entry ->
@@ -51,10 +51,10 @@ class SkinLoader(private val assetStorage: AssetStorage) {
             val fontParams = skin.fontParams[name] ?: return@forEach
             val font = entry.value
             val oldFontSize = fontParams.size
-            val scale = Gdx.graphics.width.toFloat() / (stage?.viewport?.worldWidth ?: 1280f)
+            val currentFontSize = font.data.name.replace("Roboto-Medium-", "").toInt()
             val newFontSize = (oldFontSize * scale).roundToInt()
+            if (currentFontSize == newFontSize) return
             val fontScale = oldFontSize.toFloat() / newFontSize.toFloat()
-            logger.info { "Scalar [ ${Gdx.graphics.width} / ${stage?.viewport?.worldWidth ?: 1280f} = $scale | size $oldFontSize vs $newFontSize = $fontScale ]" }
 
             val newFontParams = fontParams.copy()
             newFontParams.size = newFontSize
