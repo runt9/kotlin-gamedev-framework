@@ -2,6 +2,7 @@ package com.runt9.kgdf.asset
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetDescriptor
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator
 import com.badlogic.gdx.scenes.scene2d.Group
@@ -56,8 +57,13 @@ class SkinLoader(private val assetStorage: AssetStorage) {
             if (currentFontSize == newFontSize) return
             val fontScale = oldFontSize.toFloat() / newFontSize.toFloat()
 
-            val newFontParams = fontParams.copy()
-            newFontParams.size = newFontSize
+            val newFontParams = fontParams.copy().apply {
+                size = newFontSize
+                genMipMaps = true
+                hinting = FreeTypeFontGenerator.Hinting.None
+                minFilter = Texture.TextureFilter.MipMapLinearLinear
+                magFilter = Texture.TextureFilter.MipMapLinearLinear
+            }
             val newFont = fontGen.generateFont(newFontParams)
             newFont.data.setScale(fontScale)
             newFont.setUseIntegerPositions(false)
@@ -71,7 +77,7 @@ class SkinLoader(private val assetStorage: AssetStorage) {
             skin.getAll<Window.WindowStyle>()?.forEach { entry -> if (entry.value.titleFont == font) entry.value.titleFont = newFont }
             skin.getAll<CheckBox.CheckBoxStyle>()?.forEach { entry -> if (entry.value.font == font) entry.value.font = newFont }
 
-            stage?.actors?.filterIsInstance<Group>()?.forEach { actor -> updateChildren(actor) }
+            stage.actors.filterIsInstance<Group>().forEach { actor -> updateChildren(actor) }
         }
     }
 
