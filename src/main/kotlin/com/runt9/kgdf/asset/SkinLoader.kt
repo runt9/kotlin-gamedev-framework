@@ -21,6 +21,7 @@ import ktx.assets.async.AssetStorage
 import ktx.scene2d.Scene2DSkin
 import ktx.style.getAll
 import ktx.style.set
+import kotlin.math.floor
 import kotlin.math.roundToInt
 
 class SkinLoader(private val assetStorage: AssetStorage) {
@@ -44,7 +45,7 @@ class SkinLoader(private val assetStorage: AssetStorage) {
     fun regenerateFonts(stage: Stage) {
         logger.info { "Regenerating fonts" }
         val fontGen = assetStorage.loadSync<FreeTypeFontGenerator>("skin/Roboto-Medium.ttf")
-        val scale = Gdx.graphics.width.toFloat() / (stage.viewport.worldWidth)
+        val fontScale = stage.viewport.worldWidth / Gdx.graphics.width.toFloat()
 
         // TODO: Refactor and optimize this
         skin.getAll<BitmapFont>()?.forEach { entry ->
@@ -53,9 +54,9 @@ class SkinLoader(private val assetStorage: AssetStorage) {
             val font = entry.value
             val oldFontSize = fontParams.size
             val currentFontSize = font.data.name.replace("Roboto-Medium-", "").toInt()
-            val newFontSize = (oldFontSize * scale).roundToInt()
+            // Floor is important: we don't want to round up because then a glyph could be too big and get cut off.
+            val newFontSize = floor(oldFontSize / fontScale).roundToInt()
             if (currentFontSize == newFontSize) return
-            val fontScale = oldFontSize.toFloat() / newFontSize.toFloat()
 
             val newFontParams = fontParams.copy().apply {
                 size = newFontSize

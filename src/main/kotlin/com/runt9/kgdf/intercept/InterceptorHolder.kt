@@ -14,6 +14,8 @@ interface InterceptorHolder {
         holder.interceptors.forEach { (hook, interceptors) -> this.interceptors[hook]?.removeAll(interceptors) }
 }
 
+inline fun <reified T : InterceptableContext> InterceptorHolder.addInterceptor(interceptor: Interceptor<T>) = addInterceptor(interceptor.hook, interceptor)
+
 inline fun <reified T : InterceptableContext> InterceptorHolder.addInterceptor(hook: InterceptorHook, interceptor: Interceptor<T>) {
     interceptors.computeIfAbsent(hook) { mutableSetOf() }.add(interceptor as Interceptor<InterceptableContext>)
 }
@@ -21,6 +23,8 @@ inline fun <reified T : InterceptableContext> InterceptorHolder.addInterceptor(h
 inline fun <reified T : InterceptableContext> InterceptorHolder.addInterceptor(hook: InterceptorHook, crossinline interceptorFn: (T) -> Unit) {
     addInterceptor(hook, intercept(hook, interceptorFn))
 }
+
+inline fun <reified T : InterceptableContext> InterceptorHolder.removeInterceptor(interceptor: Interceptor<T>): Boolean = removeInterceptor(interceptor.hook, interceptor)
 
 inline fun <reified T : InterceptableContext> InterceptorHolder.removeInterceptor(hook: InterceptorHook, interceptor: Interceptor<T>): Boolean {
     return interceptors[hook]?.remove(interceptor as Interceptor<InterceptableContext>) ?: false

@@ -10,6 +10,7 @@ abstract class PlayerSettings {
     abstract val vsync: Boolean
     abstract val logLevel: Int
     abstract val resolution: Resolution
+    abstract val uiScale: Float
     abstract val mainVolume: Float
     abstract val soundVolume: Float
     abstract val musicVolume: Float
@@ -30,6 +31,7 @@ abstract class PlayerSettings {
                 override val vsync = true
                 override val logLevel = LOG_ERROR
                 override val resolution = Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate)
+                override val uiScale = 1f
                 override val mainVolume = 0.2f
                 override val soundVolume = 1f
                 override val musicVolume = 0.75f

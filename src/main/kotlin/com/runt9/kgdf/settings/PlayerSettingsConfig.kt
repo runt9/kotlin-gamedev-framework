@@ -4,11 +4,16 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.Graphics
 import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.ext.lazyInject
+import com.runt9.kgdf.intercept.BaseInterceptorHook
+import com.runt9.kgdf.intercept.InterceptableAdapter
+import com.runt9.kgdf.intercept.UiScaleChangeContext
+import com.runt9.kgdf.log.kgdfLogger
 
 const val USER_SETTINGS_FILE = "settings.json"
 
 // TODO: Backwards-compatibility capabilities for migrating settings files
-class PlayerSettingsConfig(private val store: SettingsStore<*>) {
+class PlayerSettingsConfig(private val store: SettingsStore<*>) : InterceptableAdapter() {
+    private val logger = kgdfLogger()
     private val graphics by lazyInject<Graphics>()
     private val soundService by lazyInject<SoundService>()
 
@@ -19,6 +24,11 @@ class PlayerSettingsConfig(private val store: SettingsStore<*>) {
             applyResolution()
             graphics.setVSync(settings.vsync)
             soundService.adjustMusicVolume(combinedMusicVolume)
+
+            UiScaleChangeContext(uiScale).apply {
+                addInterceptors(this@PlayerSettingsConfig)
+                intercept(BaseInterceptorHook.ON_UI_SCALE_CHANGE)
+            }
         }
     }
 
