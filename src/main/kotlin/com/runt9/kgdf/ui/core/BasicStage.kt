@@ -3,9 +3,12 @@ package com.runt9.kgdf.ui.core
 import com.badlogic.gdx.scenes.scene2d.Group
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.Viewport
+import com.runt9.kgdf.ui.controller.DialogController
 import com.runt9.kgdf.ui.view.View
 
 class BasicStage(viewport: Viewport) : Stage(viewport) {
+    val activeDialogs = mutableListOf<DialogController>()
+
     fun render(delta: Float) {
         viewport.apply()
         act(delta)

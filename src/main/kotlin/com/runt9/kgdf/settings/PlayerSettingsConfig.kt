@@ -21,14 +21,14 @@ class PlayerSettingsConfig(private val store: SettingsStore<*>) : InterceptableA
 
     fun apply(settings: PlayerSettings) {
         settings.apply {
-            applyResolution()
-            graphics.setVSync(settings.vsync)
-            soundService.adjustMusicVolume(combinedMusicVolume)
-
             UiScaleChangeContext(uiScale).apply {
                 addInterceptors(this@PlayerSettingsConfig)
                 intercept(BaseInterceptorHook.ON_UI_SCALE_CHANGE)
             }
+
+            applyResolution()
+            graphics.setVSync(settings.vsync)
+            soundService.adjustMusicVolume(combinedMusicVolume)
         }
     }
 

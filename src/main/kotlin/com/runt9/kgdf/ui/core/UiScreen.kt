@@ -29,7 +29,7 @@ abstract class UiScreen(private val width: Float, private val height: Float) : B
     override val stages = listOf(uiStage)
     abstract val uiController: Controller
     private val uiChangeInterceptor = intercept<UiScaleChangeContext>(BaseInterceptorHook.ON_UI_SCALE_CHANGE) { ctx ->
-        applyUiScale(ctx.uiScale)
+        applyUiScale(ctx.uiScale, true)
     }
 
     init {
@@ -58,13 +58,23 @@ abstract class UiScreen(private val width: Float, private val height: Float) : B
         skinLoader.regenerateFonts(uiStage)
     }
 
-    // TODO: Still isn't redrawing across the whole screen when executed while showing
-    fun applyUiScale(uiScale: Float) {
+    // TODO: Maybe can just push this all to BasicStage
+    fun applyUiScale(uiScale: Float, atRuntime: Boolean = false) {
         // Divide by uiScale because we want 50% UI scale to decrease the size of UI elements, which means we need to make the Viewport have a larger world size
         val newWidth = width / uiScale
         val newHeight = height / uiScale
+        val activeDialogs = uiStage.activeDialogs.toList()
+        if (atRuntime) {
+            uiStage.clear()
+            activeDialogs.forEach { it.hide() }
+        }
         uiStage.viewport.setWorldSize(newWidth, newHeight)
         uiStage.viewport.update(Gdx.graphics.width, Gdx.graphics.height, true)
+        if (atRuntime) {
+            show()
+            logger.info { "At runtime, reshowing all active dialogs $activeDialogs" }
+            activeDialogs.forEach { it.show(uiStage, skipAnimation = true) }
+        }
         skinLoader.regenerateFonts(uiStage)
     }
 }

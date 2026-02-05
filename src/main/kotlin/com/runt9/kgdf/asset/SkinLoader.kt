@@ -43,7 +43,6 @@ class SkinLoader(private val assetStorage: AssetStorage) {
     }
 
     fun regenerateFonts(stage: Stage) {
-        logger.info { "Regenerating fonts" }
         val fontGen = assetStorage.loadSync<FreeTypeFontGenerator>("skin/Roboto-Medium.ttf")
         val fontScale = stage.viewport.worldWidth / Gdx.graphics.width.toFloat()
 

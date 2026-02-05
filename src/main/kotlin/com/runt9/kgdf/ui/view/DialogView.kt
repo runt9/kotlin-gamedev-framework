@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import com.badlogic.gdx.utils.Align
 import com.kotcrab.vis.ui.widget.VisDialog
 import com.runt9.kgdf.ext.inject
-import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.ui.controller.DialogController
 import ktx.scene2d.KTable
 
