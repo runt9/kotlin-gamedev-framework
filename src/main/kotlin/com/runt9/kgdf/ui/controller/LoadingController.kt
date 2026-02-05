@@ -1,5 +1,7 @@
 package com.runt9.kgdf.ui.controller
 
+import com.runt9.kgdf.asset.PixelArtShaderDefinition
+import com.runt9.kgdf.asset.ShaderStorage
 import com.runt9.kgdf.event.AssetsLoadedEvent
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.HandlesEvent
@@ -9,13 +11,24 @@ import com.runt9.kgdf.ui.viewModel.LoadingViewModel
 import ktx.assets.async.AssetStorage
 import ktx.async.onRenderingThread
 
-abstract class LoadingController(width: Float, height: Float, private val assets: AssetStorage, private val eventBus: EventBus) : UiScreenController(width, height) {
+abstract class LoadingController(
+    width: Float,
+    height: Float,
+    private val assets: AssetStorage,
+    private val eventBus: EventBus,
+    private val shaderStorage: ShaderStorage
+) : UiScreenController(width, height) {
     private val logger = kgdfLogger()
     abstract override val vm: LoadingViewModel
+    protected abstract val usePixelArtShader: Boolean
 
     override fun show() {
         super.show()
         eventBus.registerHandlers(this)
+
+        if (usePixelArtShader) {
+            shaderStorage.compileAndRegisterShader(PixelArtShaderDefinition)
+        }
     }
 
     override fun render(delta: Float) {

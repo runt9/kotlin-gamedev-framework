@@ -7,6 +7,7 @@ import com.runt9.kgdf.application.ApplicationConfiguration
 import com.runt9.kgdf.application.ApplicationInitializer
 import com.runt9.kgdf.asset.AssetConfig
 import com.runt9.kgdf.asset.AssetLoader
+import com.runt9.kgdf.asset.ShaderStorage
 import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.event.EventBus
@@ -52,6 +53,7 @@ object Injector : Context() {
 
         bindSingleton<GameServiceRegistry>()
         bindSingleton<SoundService>()
+        bindSingleton<ShaderStorage>()
 
         additionalDependencies.initServiceDeps(this)
 
