@@ -25,7 +25,7 @@ abstract class ViewModel : Disposable {
     }
 
     open inner class Binding<T : Any>(initialValue: T) : Disposable {
-        internal var dirty = false
+        var dirty = false
         protected var savedValue = initialValue
         protected var currentValue = savedValue
         protected val binds = mutableSetOf<Updatable>()

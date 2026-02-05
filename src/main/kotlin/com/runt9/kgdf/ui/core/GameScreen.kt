@@ -11,7 +11,7 @@ import com.runt9.kgdf.ui.controller.Controller
  */
 abstract class GameScreen(uiWidth: Float, uiHeight: Float, worldWidth: Float, worldHeight: Float) : UiScreen(uiWidth, uiHeight) {
     protected val camera = OrthographicCamera(worldWidth, worldHeight)
-    protected val gameStage: BasicStage = BasicStage(FitViewport(worldWidth, worldHeight, camera))
+    protected val gameStage: BasicStage = BasicStage(uiWidth, uiHeight, FitViewport(worldWidth, worldHeight, camera))
     override val stages = listOf(gameStage, uiStage)
     abstract val gameController: Controller
 
