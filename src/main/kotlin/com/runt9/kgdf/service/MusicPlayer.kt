@@ -7,7 +7,7 @@ class MusicPlayer(private val playlist: List<Music>, private var volume: Float) 
     private var currentSong: Music? = null
 
     fun start() {
-        if (playlist.isEmpty()) return
+        if (playlist.isEmpty() || currentSong != null) return
         currentSong = playlist[0]
         playSong()
     }
