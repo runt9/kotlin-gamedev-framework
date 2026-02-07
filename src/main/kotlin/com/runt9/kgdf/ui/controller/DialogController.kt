@@ -6,7 +6,6 @@ import com.runt9.kgdf.ui.core.BasicStage
 import com.runt9.kgdf.ui.view.DialogView
 
 abstract class DialogController : Controller {
-    private val logger = kgdfLogger()
     abstract override val view: DialogView
     protected var stage: BasicStage? = null
 
@@ -16,7 +15,6 @@ abstract class DialogController : Controller {
         if (!isShown) {
             load()
             this.stage = stage
-            logger.info { "Showing, adding to active dialogs" }
             stage.activeDialogs += this
             view.initStage(stage)
             if (skipAnimation) {
@@ -33,7 +31,6 @@ abstract class DialogController : Controller {
         if (isShown) {
             view.hide()
             isShown = false
-            logger.info { "Hiding, removing from active dialogs" }
             stage?.activeDialogs -= this
             stage = null
             dispose()
