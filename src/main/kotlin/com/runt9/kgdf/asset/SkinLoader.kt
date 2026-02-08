@@ -45,6 +45,7 @@ class SkinLoader(private val assetStorage: AssetStorage) {
     fun regenerateFonts(stage: Stage) {
         val fontGen = assetStorage.loadSync<FreeTypeFontGenerator>("skin/Roboto-Medium.ttf")
         val fontScale = stage.viewport.worldWidth / Gdx.graphics.width.toFloat()
+        logger.info { "Regenerating fonts with font scale $fontScale" }
 
         // TODO: Refactor and optimize this
         skin.getAll<BitmapFont>()?.forEach { entry ->
@@ -55,7 +56,8 @@ class SkinLoader(private val assetStorage: AssetStorage) {
             val currentFontSize = font.data.name.replace("Roboto-Medium-", "").toInt()
             // Floor is important: we don't want to round up because then a glyph could be too big and get cut off.
             val newFontSize = floor(oldFontSize / fontScale).roundToInt()
-            if (currentFontSize == newFontSize) return
+            logger.debug { "Regenerating font $name: [ oldSize: $oldFontSize, currentSize: $currentFontSize, newSize: $newFontSize ]" }
+            if (currentFontSize == newFontSize) return@forEach
 
             val newFontParams = fontParams.copy().apply {
                 size = newFontSize

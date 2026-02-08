@@ -17,6 +17,7 @@ class SoundService(private val assets: AssetStorage, private val settings: Playe
     }
 
     fun playMusic(soundDefs: List<AssetDefinition>) {
+        if (currentMusicPlayer != null) return
         val playlist = soundDefs.map { assets.loadMusic(it) }
         val initialVolume = settings.get().combinedMusicVolume
         currentMusicPlayer = MusicPlayer(playlist, initialVolume)
