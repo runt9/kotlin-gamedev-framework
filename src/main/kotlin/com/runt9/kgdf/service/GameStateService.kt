@@ -4,23 +4,33 @@ package com.runt9.kgdf.service
 
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.GameStateUpdated
-import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.game.GameState
+import com.runt9.kgdf.log.kgdfLogger
+import com.runt9.kgdf.service.ServiceAsync.launchOnServiceThread
 
 abstract class GameStateService<T : GameState>(
     private val eventBus: EventBus,
-    registry: GameServiceRegistry,
     private val stateService: SingleFileSaveStateService<T>
-) : GameService(eventBus, registry) {
+) {
     private val logger = kgdfLogger()
     private lateinit var gameState: T
 
-    // TODO: This should probably jump into the service thread to load but the caller expects things to be synchronous
-    fun load() = gameState.clone() as T
+    fun load(): T {
+        if (!this@GameStateService::gameState.isInitialized) {
+            if (stateService.hasSavedFile()) {
+                gameState = stateService.loadState()
+            } else {
+                gameState = initNewState()
+                stateService.saveState(gameState)
+            }
+        }
+
+        return gameState.clone() as T
+    }
 
     fun save(gameState: T, forceUpdate: Boolean = false) {
         if (!this@GameStateService::gameState.isInitialized || forceUpdate || gameState != this@GameStateService.gameState) {
-            logger.debug { "Saving run state" }
+            logger.debug { "Saving game state" }
             this@GameStateService.gameState = gameState
             eventBus.enqueueEventSync(GameStateUpdated(gameState.clone()))
             stateService.saveState(gameState)
@@ -30,7 +40,9 @@ abstract class GameStateService<T : GameState>(
     fun update(forceUpdate: Boolean = false, update: T.() -> Unit) = launchOnServiceThread {
         load().apply {
             update()
-            save(this)
+            save(this, forceUpdate)
         }
     }
+
+    abstract fun initNewState(): T
 }
