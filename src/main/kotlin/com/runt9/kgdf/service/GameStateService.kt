@@ -8,7 +8,7 @@ import com.runt9.kgdf.game.GameState
 import com.runt9.kgdf.log.kgdfLogger
 import com.runt9.kgdf.service.ServiceAsync.launchOnServiceThread
 
-abstract class GameStateService<T : GameState>(
+abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
     private val eventBus: EventBus,
     private val stateService: SingleFileSaveStateService<T>
 ) {
@@ -32,7 +32,7 @@ abstract class GameStateService<T : GameState>(
         if (!this@GameStateService::gameState.isInitialized || forceUpdate || gameState != this@GameStateService.gameState) {
             logger.debug { "Saving game state" }
             this@GameStateService.gameState = gameState
-            eventBus.enqueueEventSync(GameStateUpdated(gameState.clone()))
+            eventBus.enqueueEventSync(updatedEvent(gameState.clone() as T))
             stateService.saveState(gameState)
         }
     }
@@ -45,4 +45,5 @@ abstract class GameStateService<T : GameState>(
     }
 
     abstract fun initNewState(): T
+    abstract fun updatedEvent(state: T): E
 }
