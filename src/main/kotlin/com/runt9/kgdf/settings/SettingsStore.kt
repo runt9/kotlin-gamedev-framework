@@ -35,7 +35,7 @@ abstract class SettingsStore<T : PlayerSettings>(
         }
 
         if (settingsFile.exists()) {
-            settings = Json.decodeFromStream(serializer, settingsFile.read())
+            settings = json.decodeFromStream(serializer, settingsFile.read())
         } else {
             save(defaultSettings)
         }
