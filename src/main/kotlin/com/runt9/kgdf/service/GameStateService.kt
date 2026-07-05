@@ -37,7 +37,11 @@ abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
         }
     }
 
-    fun update(forceUpdate: Boolean = false, update: T.() -> Unit) = launchOnServiceThread {
+    fun updateAsync(forceUpdate: Boolean = false, update: T.() -> Unit) = launchOnServiceThread {
+        update(forceUpdate, update)
+    }
+
+    fun update(forceUpdate: Boolean = false, update: T.() -> Unit) {
         load().apply {
             update()
             save(this, forceUpdate)

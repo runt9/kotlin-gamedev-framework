@@ -65,7 +65,9 @@ class EventBus : Disposable {
             while (!eventQueue.isClosedForReceive) {
                 eventQueue.receiveCatching().apply {
                     if (isFailure) {
-                        logger.error { "An error occurred while receiving event from queue. ${this.exceptionOrNull()}" }
+                        if (exceptionOrNull() != null) {
+                            logger.error { "An error occurred while receiving event from queue. ${this.exceptionOrNull()}" }
+                        }
                         return@launch
                     }
 
