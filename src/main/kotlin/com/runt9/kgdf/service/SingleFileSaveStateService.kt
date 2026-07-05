@@ -15,6 +15,8 @@ import kotlin.reflect.KClass
 const val SAVES_DIR = "saves"
 const val SAVED_RUN_FILE = "savedRun"
 
+class InvalidSaveFileException(e: Exception) : Exception(e)
+
 // TODO: Take manifest style from AutoHack and make that another version of this
 abstract class SingleFileSaveStateService<T : Any>(
     private val stateType: KClass<T>,
@@ -51,7 +53,16 @@ abstract class SingleFileSaveStateService<T : Any>(
 
     fun hasSavedFile(): Boolean {
         val fileHandle = stateFileHandle()
-        return fileHandle.exists() && fileHandle.readString().isNotEmpty()
+        val isRealFile = fileHandle.exists() && fileHandle.readString().isNotEmpty()
+        if (!isRealFile) return false
+
+        try {
+            loadState()
+        } catch (e: Exception) {
+            throw InvalidSaveFileException(e)
+        }
+
+        return true
     }
     fun clearSavedFile(): Boolean {
         logger.debug { "Clearing saved file" }
