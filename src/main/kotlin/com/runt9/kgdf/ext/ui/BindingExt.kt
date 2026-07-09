@@ -43,16 +43,18 @@ fun Label.bindLabelText(strGetter: Updatable.() -> String) = updatable { setText
 fun <T : Any> Actor.bindVisible(
     binding: ViewModel.Binding<T>,
     visibleValue: T,
-    evaluateOnCall: Boolean = true
-) = bindVisible(binding, evaluateOnCall) { this == visibleValue }
+    evaluateOnCall: Boolean = true,
+    affectsTouchable: Boolean = true
+) = bindVisible(binding, evaluateOnCall, affectsTouchable) { this == visibleValue }
 
 fun <T : Any> Actor.bindVisible(
     binding: ViewModel.Binding<T>,
     evaluateOnCall: Boolean = true,
+    affectsTouchable: Boolean = true,
     predicate: T.() -> Boolean
 ) = bindUpdatable(binding, evaluateOnCall) {
     isVisible = predicate(binding.get())
-    touchable = if (isVisible) Touchable.enabled else Touchable.disabled
+    if (affectsTouchable) touchable = if (isVisible) Touchable.enabled else Touchable.disabled
 }
 
 fun <A : Actor> A.bindUpdatables(bindings: Iterable<ViewModel.Binding<*>>, evaluateOnCall: Boolean = true, updater: A.() -> Unit) {
