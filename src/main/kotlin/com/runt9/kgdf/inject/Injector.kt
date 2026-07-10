@@ -10,6 +10,7 @@ import com.runt9.kgdf.asset.AssetLoader
 import com.runt9.kgdf.asset.ShaderStorage
 import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.asset.SoundService
+import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
@@ -28,6 +29,7 @@ object Injector : Context() {
 
     fun initStartupDeps() = register {
         bindSingleton<ApplicationConfiguration>()
+        bindSingleton<AsyncFactory>()
         bindSingleton<EventBus>()
         bindSingleton<AssetConfig>()
         bindSingleton<SkinLoader>()

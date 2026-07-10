@@ -3,12 +3,12 @@
 package com.runt9.kgdf.event
 
 import com.badlogic.gdx.utils.Disposable
+import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
-import ktx.async.newSingleThreadAsyncContext
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.findAnnotation
@@ -19,9 +19,9 @@ import kotlin.reflect.jvm.jvmErasure
 
 
 @Suppress("UNCHECKED_CAST")
-class EventBus : Disposable {
+class EventBus(asyncFactory: AsyncFactory) : Disposable {
     private val logger = kgdfLogger()
-    private val asyncContext = newSingleThreadAsyncContext("Event-Thread")
+    private val asyncContext = asyncFactory.newAsyncContext("Event-Thread")
     private val eventQueue = Channel<Event>()
     private val eventHandlers = mutableMapOf<KClass<out Event>, MutableList<EventHandler<Event>>>()
     private val handlerClasses = mutableSetOf<ClassHandlerMapping>()
@@ -87,7 +87,7 @@ class EventBus : Disposable {
         eventQueue.close()
         eventHandlers.clear()
         handlerClasses.clear()
-        asyncContext.dispose()
+        (asyncContext as? Disposable)?.dispose()
     }
 
     private inner class ClassHandlerMapping(val obj: Any) {
