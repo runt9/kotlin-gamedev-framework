@@ -39,4 +39,5 @@ fun dynamicInjectCheckIsSubclassOf(clazz: Class<*>) = { classToCheck: Class<*> -
 
     foundMatch
 }
+
 fun dynamicInjectCheckAssignableFrom(clazz: Class<*>) = { c: Class<*> -> c.isAssignableFrom(clazz) }

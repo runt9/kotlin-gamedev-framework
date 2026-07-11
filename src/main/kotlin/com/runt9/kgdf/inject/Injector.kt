@@ -18,16 +18,38 @@ import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
 import ktx.inject.register
 
-// TODO: Might be a good idea, instead of injecting everything, to instead have the list of dependencies that can be injected and removed
-//  from the context, making it easier to fully inject then fully tear-down everything in the Game state
-object Injector : Context() {
+object Injector {
+    private val originalContext: Context = Context()
+    var ctx: Context = originalContext
+        private set
+
     private val additionalDependencies = mutableListOf<InjectorDependencies>()
+
+    // Since Injector simply wraps Context rather than inherits from it (to increase testability), it needs to implement it
+    // as if it were an interface then delegate to the given context.
+    inline fun <reified Type : Any> inject(): Type = ctx.inject()
+    inline fun <reified Type : Any> bindSingleton(singleton: Type) = ctx.bindSingleton(singleton)
+    inline fun <reified Type : Any> bindSingleton(noinline provider: () -> Type) = ctx.bindSingleton(provider)
+    inline fun <reified Type : Any> bind(noinline provider: () -> Type) = ctx.bind(provider)
+    inline fun <reified Type : Any> remove() = ctx.remove<Type>()
+    inline fun <reified Type : Any> newInstanceOf(): Type = ctx.newInstanceOf()
+    fun <Type> getProvider(forClass: Class<Type>) = ctx.getProvider(forClass)
+    fun <Type> removeProvider(ofClass: Class<Type>) = ctx.removeProvider(ofClass)
+    fun clear() = ctx.clear()
+
+    fun overrideContext(ctx: Context) {
+        this.ctx = ctx
+    }
+
+    fun restoreContext() {
+        this.ctx = originalContext
+    }
 
     fun registerAdditionalDependencies(deps: InjectorDependencies) {
         additionalDependencies += deps
     }
 
-    fun initStartupDeps() = register {
+    fun initStartupDeps() = ctx.register {
         bindSingleton<ApplicationConfiguration>()
         bindSingleton<AsyncFactory>()
         bindSingleton<EventBus>()
@@ -39,7 +61,7 @@ object Injector : Context() {
         additionalDependencies.initStartupDeps(this)
     }
 
-    fun initGdxDeps() = register {
+    fun initGdxDeps() = ctx.register {
         bindSingleton(Gdx.app)
         bindSingleton(Gdx.audio)
         bindSingleton(Gdx.files)
@@ -49,7 +71,7 @@ object Injector : Context() {
         bindSingleton(Gdx.net)
     }
 
-    fun initRunningDeps() = register {
+    fun initRunningDeps() = ctx.register {
         bindSingleton(InputMultiplexer())
         bindSingleton(GdxAI.getTimepiece())
 
