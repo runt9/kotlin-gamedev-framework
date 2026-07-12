@@ -3,3 +3,4 @@
 *.iml
 # Project exclude paths
 /build
+.agentbridge

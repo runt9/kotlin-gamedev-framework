@@ -1,19 +1,10 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val gdxVersion: String by project
-val gdxAiVersion: String by project
-val ktxVersion: String by project
-val korlibsVersion: String by project
-val kotlinCoroutinesVersion: String by project
-val kotlinSerializationVersion: String by project
-val junitVersion: String by project
-val assertkVersion: String by project
-val mockkVersion: String by project
-
 plugins {
-    kotlin("jvm") version "2.1.20"
-    kotlin("plugin.serialization") version "1.6.0"
-    id("com.github.ben-manes.versions") version "0.51.0"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.versions)
     `maven-publish`
     `java-library`
 }
@@ -31,30 +22,30 @@ repositories {
 }
 
 fun DependencyHandlerScope.apiKotlin(vararg names: String) = names.forEach { api(kotlin(it)) }
-fun DependencyHandlerScope.apiKotlinx(vararg opts: Pair<String, String>) =
-    opts.forEach { api(group = "org.jetbrains.kotlinx", name = "kotlinx-${it.first}", version = it.second) }
 
 fun DependencyHandlerScope.apiGdx(vararg names: String, classifier: String = "") =
-    names.forEach { api(group = "com.badlogicgames.gdx", name = it, version = gdxVersion, classifier = classifier) }
+    names.forEach { api(group = "com.badlogicgames.gdx", name = it, version = libs.versions.gdx.get(), classifier = classifier) }
 
 fun DependencyHandlerScope.apiGdxNative(vararg names: String) = apiGdx(classifier = "natives-desktop", names = names)
 fun DependencyHandlerScope.apiKtx(vararg names: String) =
-    names.forEach { api(group = "io.github.libktx", name = "ktx-$it", version = ktxVersion) }
+    names.forEach { api(group = "io.github.libktx", name = "ktx-$it", version = libs.versions.ktx.get()) }
 
 fun DependencyHandlerScope.apiKorlibs(vararg names: String) =
-    names.forEach { api(group = "com.soywiz.korlibs.$it", name = "$it-jvm", version = korlibsVersion) }
+    names.forEach { api(group = "com.soywiz.korlibs.$it", name = "$it-jvm", version = libs.versions.korlibs.get()) }
 
 dependencies {
     apiKotlin("stdlib", "reflect")
-    apiKotlinx("serialization-json" to kotlinSerializationVersion, "serialization-cbor" to kotlinSerializationVersion, "coroutines-core" to kotlinCoroutinesVersion)
+    api(libs.kotlinx.serialization.json)
+    api(libs.kotlinx.serialization.cbor)
+    api(libs.kotlinx.coroutines.core)
     apiGdx("gdx", "gdx-freetype", "gdx-backend-lwjgl3")
     apiGdxNative("gdx-platform", "gdx-freetype-platform")
-    api("com.badlogicgames.gdx:gdx-ai:$gdxAiVersion")
+    api(libs.gdx.ai)
     apiKorlibs("klock")
-    api("com.github.raeleus.stripe:freetype:2.0.0")
-    api("io.github.oshai:kotlin-logging-jvm:7.0.3")
-    api("org.slf4j:slf4j-api:2.0.17")
-    api("ch.qos.logback:logback-classic:1.5.23")
+    api(libs.freetype.stripe)
+    api(libs.kotlin.logging)
+    api(libs.slf4j.api)
+    api(libs.logback.classic)
 
     apiKtx(
         "app",
@@ -77,9 +68,9 @@ dependencies {
     )
 
     testApi(kotlin("test"))
-    testApi("org.junit.jupiter:junit-jupiter:$junitVersion")
-    testApi("com.willowtreeapps.assertk:assertk-jvm:$assertkVersion")
-    testApi("io.mockk:mockk:$mockkVersion")
+    testApi(libs.junit.jupiter)
+    testApi(libs.assertk)
+    testApi(libs.mockk)
 }
 
 tasks.test {
@@ -107,6 +98,6 @@ tasks.withType<KotlinCompile> {
         "kotlinx.serialization.ExperimentalSerializationApi",
         "kotlinx.coroutines.ExperimentalCoroutinesApi"
     )
-    kotlinOptions.freeCompilerArgs += "-Xopt-in=${optIns.joinToString(",")}"
-    kotlinOptions.jvmTarget = "17"
+    compilerOptions.freeCompilerArgs.add("-opt-in=${optIns.joinToString(",")}")
+    compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
 }
