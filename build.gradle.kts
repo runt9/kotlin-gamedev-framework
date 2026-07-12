@@ -14,6 +14,10 @@ java {
     withSourcesJar()
 }
 
+kotlin {
+    jvmToolchain(17)
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
