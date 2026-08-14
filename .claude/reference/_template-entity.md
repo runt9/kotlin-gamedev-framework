@@ -55,9 +55,9 @@ CHECKLIST — delete this block before saving.
   [ ] Relations declare part_of the index note for this kind. The index lives in
       domains/, and _validate.py enforces the backlink, so an entity note that is
       not indexed will warn.
-  [ ] Play notes mark claims [observed] / [stated] / [derived] inline in prose —
-      see "RogueFlip-specific conventions" in README.md. Do not convert those into
-      observation categories or tags.
+  [ ] No note names a consuming project — see "kgdfw-specific conventions" in
+      README.md. Suggest usage generically; never cite a downstream repo as
+      evidence, and never link out to one.
   [ ] Title matches the [[wikilinks]] other notes will use to reach it, and is
       unique across the whole KB.
 -->

@@ -5,10 +5,12 @@ package com.runt9.kgdf.event
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.log.kgdfLogger
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import ktx.async.KtxAsync
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.findAnnotation
@@ -74,7 +76,14 @@ class EventBus(asyncFactory: AsyncFactory) : Disposable {
                     val event = getOrThrow()
                     eventHandlers[event::class]?.toList()?.forEach {
                         logger.debug { "Handling event ${event::class.simpleName}" }
-                        it.handle(event)
+                        try {
+                            it.handle(event)
+                        } catch (e: CancellationException) {
+                            throw e // shutdown — must not fall into the catch below
+                        } catch (e: Exception) {
+                            val cause = (e as? InvocationTargetException)?.cause ?: e
+                            logger.error(cause) { "Handler for ${event::class.simpleName} failed; bus continues" }
+                        }
                     }
                 }
             }
