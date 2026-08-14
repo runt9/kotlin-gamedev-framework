@@ -27,8 +27,10 @@ class CapturingSink : LogSink {
  *
  * [KgdfLog] is process-wide, so a test that swaps the sink without restoring it silently steals every later
  * test's log output. Always prefer this to assigning `KgdfLog.sink` directly.
+ *
+ * Inline so [block] may suspend; drop the keyword and any caller awaiting a background thread stops compiling.
  */
-fun <T> capturingLogs(minLevel: LogLevel = LogLevel.TRACE, block: (CapturingSink) -> T): T {
+inline fun <T> capturingLogs(minLevel: LogLevel = LogLevel.TRACE, block: (CapturingSink) -> T): T {
     val previousSink = KgdfLog.sink
     val previousLevel = KgdfLog.minLevel
     val sink = CapturingSink()
