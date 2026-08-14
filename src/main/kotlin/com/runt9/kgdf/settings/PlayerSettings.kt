@@ -1,14 +1,14 @@
 package com.runt9.kgdf.settings
 
-import com.badlogic.gdx.Application.LOG_ERROR
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
+import com.runt9.kgdf.log.LogLevel
 import kotlinx.serialization.Serializable
 
 @Serializable
 abstract class PlayerSettings {
     abstract val fullscreen: Boolean
     abstract val vsync: Boolean
-    abstract val logLevel: Int
+    abstract val minLogLevel: LogLevel
     abstract val resolution: Resolution
     abstract val uiScale: Float
     abstract val mainVolume: Float
@@ -29,7 +29,7 @@ abstract class PlayerSettings {
             return object : PlayerSettings() {
                 override val fullscreen = false
                 override val vsync = true
-                override val logLevel = LOG_ERROR
+                override val minLogLevel = LogLevel.ERROR
                 override val resolution = Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate)
                 override val uiScale = 1f
                 override val mainVolume = 0.2f

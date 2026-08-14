@@ -64,7 +64,6 @@ dependencies {
         "graphics",
         "inject",
         "json",
-        "log",
         "math",
         "preferences",
         "reflect",
