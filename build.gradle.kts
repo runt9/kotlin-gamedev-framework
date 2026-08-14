@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.versions)
     `maven-publish`
     `java-library`
+    `java-test-fixtures`
 }
 
 java {
@@ -71,10 +72,13 @@ dependencies {
         "vis-style"
     )
 
-    testApi(kotlin("test"))
-    testApi(libs.junit.jupiter)
-    testApi(libs.assertk)
-    testApi(libs.mockk)
+    // testFixturesApi, not testApi: test-scoped dependencies are never published, so testApi reaches no consumer.
+    testFixturesApi(libs.kotest.framework.engine)
+    testFixturesApi(libs.kotest.assertions.core)
+    testFixturesApi(libs.kotest.runner.junit5)
+    testFixturesApi(libs.kotlinx.coroutines.test)
+
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {
