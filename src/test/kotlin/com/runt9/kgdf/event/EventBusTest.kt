@@ -172,4 +172,29 @@ class EventBusTest : FunSpec({
             sink.messagesAt(LogLevel.ERROR) shouldBe emptyList()
         }
     }
+
+    // pending exists so the bus can be composed with other WorkSources. The count has to be up the moment
+    // enqueueEvent returns, not once the Event-Thread picks the event up, or a caller checking whether it is
+    // safe to act sees zero during the gap between the two.
+    test("pending counts an event from the moment it is enqueued until its handler finishes").config(coroutineTestScope = true) {
+        val bus = busOn(testCoroutineScheduler)
+        val recorder = SuspendingRecorder()
+        bus.registerHandlers(recorder)
+
+        bus.pending.value shouldBe 0
+
+        bus.enqueueEvent(ValueEvent(1))
+        // Deliberately no advance: this is the window the counting-on-submit rule exists to close.
+        bus.pending.value shouldBe 1
+        bus.isIdle shouldBe false
+
+        bus.enqueueEvent(ValueEvent(2))
+        bus.pending.value shouldBe 2
+
+        testCoroutineScheduler.advanceUntilIdle()
+
+        bus.pending.value shouldBe 0
+        bus.isIdle shouldBe true
+        recorder.seen shouldContainExactly listOf("enter:1", "exit:1", "enter:2", "exit:2")
+    }
 })

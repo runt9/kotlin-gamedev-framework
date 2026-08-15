@@ -21,14 +21,14 @@ import kotlinx.coroutines.flow.update
  *
  * Safe to call from any thread.
  */
-class WorkTracker {
+class WorkTracker : WorkSource {
     private val outstanding = MutableStateFlow(0)
 
     /** Exposed as a flow, not an `Int`, so several trackers can be composed into one settled-check without polling. */
-    val pending: StateFlow<Int> = outstanding.asStateFlow()
+    override val pending: StateFlow<Int> = outstanding.asStateFlow()
 
     /** A plain volatile read, so this is safe on the rendering thread where suspending or blocking would deadlock. */
-    val isIdle: Boolean get() = outstanding.value == 0
+    override val isIdle: Boolean get() = outstanding.value == 0
 
     // update {}, never `value = value + 1`: the latter is a non-atomic read-modify-write that drops concurrent
     // increments with no error.
@@ -37,7 +37,7 @@ class WorkTracker {
     fun exit() = outstanding.update { it - 1 }
 
     /** Returns immediately when already idle because `first` tests the current value before suspending, so there is no lost wakeup. */
-    suspend fun awaitIdle() {
+    override suspend fun awaitIdle() {
         outstanding.first { it == 0 }
     }
 

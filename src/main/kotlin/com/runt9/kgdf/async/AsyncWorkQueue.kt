@@ -28,16 +28,16 @@ class AsyncWorkQueue<T>(
     asyncFactory: AsyncFactory,
     private val threadName: String,
     private val handleItem: suspend (T) -> Unit
-) : Disposable {
+) : Disposable, WorkSource {
     private val logger = kgdfLogger()
     private val context = asyncFactory.newAsyncContext(threadName)
     private val queue = Channel<T>(Channel.UNLIMITED)
     private val tracker = WorkTracker()
     private var loop: Job? = null
 
-    val pending: StateFlow<Int> get() = tracker.pending
-    val isIdle: Boolean get() = tracker.isIdle
-    suspend fun awaitIdle() = tracker.awaitIdle()
+    override val pending: StateFlow<Int> get() = tracker.pending
+    override val isIdle: Boolean get() = tracker.isIdle
+    override suspend fun awaitIdle() = tracker.awaitIdle()
 
     /**
      * Accepts an item for handling. Never suspends and never blocks the caller. The channel is unbounded, so a

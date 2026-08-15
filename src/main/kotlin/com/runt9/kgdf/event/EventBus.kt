@@ -3,8 +3,10 @@ package com.runt9.kgdf.event
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.async.AsyncWorkQueue
+import com.runt9.kgdf.async.WorkSource
 import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.StateFlow
 import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
@@ -16,17 +18,19 @@ import kotlin.reflect.jvm.jvmErasure
 
 
 @Suppress("UNCHECKED_CAST")
-class EventBus(asyncFactory: AsyncFactory) : Disposable {
+class EventBus(asyncFactory: AsyncFactory) : Disposable, WorkSource {
     private val logger = kgdfLogger()
     private val queue = AsyncWorkQueue<Event>(asyncFactory, "Event-Thread", ::dispatch)
     private val eventHandlers = mutableMapOf<KClass<out Event>, MutableList<EventHandler<Event>>>()
     private val handlerClasses = mutableSetOf<ClassHandlerMapping>()
 
     /** Whether every enqueued event has finished dispatching. A plain read, so it is safe on the rendering thread. */
-    val isIdle get() = queue.isIdle
+    override val isIdle get() = queue.isIdle
+
+    override val pending: StateFlow<Int> get() = queue.pending
 
     /** Suspends until every enqueued event has finished dispatching. Never call this from a handler -- see [dispatch]. */
-    suspend fun awaitIdle() = queue.awaitIdle()
+    override suspend fun awaitIdle() = queue.awaitIdle()
 
     fun <T : Event> enqueueEvent(event: T) {
         logger.debug { "Enqueuing event $event" }
