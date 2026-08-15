@@ -124,10 +124,19 @@ if [ -n "$JAVA_HOME" ] ; then
         JAVACMD=$JAVA_HOME/bin/java
     fi
     if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
+        # JAVA_HOME doesn't resolve to a real executable here -- e.g. a Windows JAVA_HOME
+        # (/mnt/c/...) inherited into a WSL shell, unusable from Linux. Fall back to PATH java
+        # rather than dying, same as the unset-JAVA_HOME branch below, instead of hard-failing
+        # on a JAVA_HOME that's merely wrong for this OS.
+        if command -v java >/dev/null 2>&1
+        then
+            JAVACMD=java
+        else
+            die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
 
 Please set the JAVA_HOME variable in your environment to match the
 location of your Java installation."
+        fi
     fi
 else
     JAVACMD=java

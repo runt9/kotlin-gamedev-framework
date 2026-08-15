@@ -82,6 +82,31 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+
+    // Incubating since 8.8. Kept in sync with RogueFlip's rf-common-plugin, which has the same block.
+    reports.junitXml.includeSystemOutLog.set(false)
+    reports.junitXml.includeSystemErrLog.set(false)
+
+    // Gradle prints counts only on failure, so a green run reads the same as one that executed
+    // nothing. addTestListener, not the afterSuite every example shows -- that is deprecated and
+    // goes away in Gradle 10. Keep `label` out of the listener or it captures the task.
+    val label = path
+    addTestListener(object : TestListener {
+        override fun beforeSuite(suite: TestDescriptor) = Unit
+        override fun beforeTest(test: TestDescriptor) = Unit
+        override fun afterTest(test: TestDescriptor, result: TestResult) = Unit
+
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            if (suite.parent != null) return // root suite only; it carries the task totals
+            println(
+                "TEST-SUMMARY $label ${result.resultType}" +
+                    " total=${result.testCount}" +
+                    " passed=${result.successfulTestCount}" +
+                    " failed=${result.failedTestCount}" +
+                    " skipped=${result.skippedTestCount}"
+            )
+        }
+    })
 }
 
 tasks.jar {

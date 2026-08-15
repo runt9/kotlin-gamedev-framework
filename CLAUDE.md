@@ -41,7 +41,9 @@ These are the framework's highest-cost surprises, kept here in one line each so 
 **This KB owns the mechanism; the consuming project's KB owns the usage.** What `canIntercept` compares belongs here. Which of RogueFlip's effects got it wrong belongs in RogueFlip's KB, which links across rather than restating. Cross-repo references are written as an explicit relative path in prose, never as a
 `[[wikilink]]` that cannot resolve in this corpus.
 
-RogueFlip's copy lives at `/mnt/c/Users/runt9/IdeaProjects/rogueflip/.claude/reference/`.
+RogueFlip's copy lives at `/home/avester/development/rogueflip/.claude/reference/`, a sibling of this
+repository. Both moved from `/mnt/c/Users/runt9/IdeaProjects/` into native WSL on 2026-08-15; the old
+checkouts are dead and must not be read.
 
 ## Working here
 
