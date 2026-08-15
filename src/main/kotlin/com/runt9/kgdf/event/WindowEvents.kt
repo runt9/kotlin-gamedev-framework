@@ -6,11 +6,11 @@ import kotlin.reflect.KClass
 
 class ChangeScreenRequest<S : UiScreen>(val screenClass: KClass<S>) : Event
 inline fun <reified S : UiScreen> changeScreenRequest() = ChangeScreenRequest(S::class)
-inline fun <reified S : UiScreen> EventBus.enqueueChangeScreen() = enqueueEventSync(changeScreenRequest<S>())
+inline fun <reified S : UiScreen> EventBus.enqueueChangeScreen() = enqueueEvent(changeScreenRequest<S>())
 
 class ShowDialogRequest<D : DialogController>(val dialogClass: KClass<D>, vararg val data: Any) : Event
 inline fun <reified D : DialogController> showDialogRequest(vararg data: Any) = ShowDialogRequest(D::class, *data)
-inline fun <reified S : DialogController> EventBus.enqueueShowDialog(vararg data: Any) = enqueueEventSync(showDialogRequest<S>(*data))
+inline fun <reified S : DialogController> EventBus.enqueueShowDialog(vararg data: Any) = enqueueEvent(showDialogRequest<S>(*data))
 
 class ExitRequest : Event
-fun EventBus.enqueueExitRequest() = enqueueEventSync(ExitRequest())
+fun EventBus.enqueueExitRequest() = enqueueEvent(ExitRequest())

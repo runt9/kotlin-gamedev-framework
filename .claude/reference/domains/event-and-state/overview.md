@@ -2,7 +2,7 @@
 title: Events, Async and State
 type: note
 permalink: event-and-state/overview
-tags: [eventbus, async, state, persistence]
+tags: [ eventbus, async, state, persistence ]
 verified: 2026-08-14
 branch: testability-and-testing-refactor
 coverage: partial
@@ -28,15 +28,17 @@ Three coupled concerns: how events are dispatched, which named thread work lands
 ### EventBus
 
 - [invariant] Dispatch matches the **exact runtime class**: the loop does `eventHandlers[event::class]`. A handler registered for a base type never fires for a subclass #silent-failure.
-- [fact] It is single-threaded and FIFO. The bus takes a context from `AsyncFactory.newAsyncContext("Event-Thread")`, and `loop()` receives from one `Channel<Event>` sequentially inside one coroutine.
-- [fact] The channel is constructed as `Channel<Event>()`, i.e. **rendezvous** (capacity 0), so `enqueueEvent` suspends until the loop takes the event.
+- [fact] It is single-threaded and FIFO. The bus composes an `AsyncWorkQueue<Event>` on an `AsyncFactory` context named `Event-Thread`, which receives from one channel sequentially inside one coroutine and calls `dispatch` per event.
+- [fact] The channel is **unbounded**, so `enqueueEvent` is non-suspend and never parks its caller. It was rendezvous (capacity 0) until the queue migration, which is why a `Sync` variant existed to launch onto the bus thread rather than suspend.
 - [trap] Because one loop invokes handlers sequentially and handlers may suspend (`callSuspend`), a slow handler blocks every event behind it. Head-of-line blocking is structural, not incidental #order-dependent.
-- [trap] `enqueueEventSync` is **not synchronous**. It is `KtxAsync.launch(asyncContext) { enqueueEvent(event) }` — callable from outside a coroutine, but state is not settled when it returns.
+- [question] `dispatch` also runs the handlers *for a single event* one after another, and consumers have worked around the resulting lag by moving logic into interceptors or reading state directly in the View rather than via an event. Running one event's handlers concurrently is a genuinely different proposal from running several events concurrently: it keeps the between-events ordering that consumers depend on, and since the migration to `AsyncWorkQueue` it is contained to one function. Unexplored, and two things would decide it: handlers that hop to the rendering thread would re-serialize there anyway, and concurrent handlers mutating shared state is a hazard the sequential design currently rules out.
+- [trap] `enqueueEvent` is **not synchronous**, despite being non-suspend and never parking. It hands the event to the queue and returns; handlers run later on the Event-Thread, so state is not settled when it returns #order-dependent.
 - [trap] `registerHandler` appends to a `MutableList` with **no deduplication**, and `ClassHandlerMapping` caches one handler instance per annotated function, so re-registering the same object appends the *same instance* again. `unregisterHandler` calls `remove(handler)`, which drops only one occurrence — so N registrations against one unregistration leave N-1 live copies and the event fires N-1 times #silent-failure.
-- [invariant] `EventHandler.handle` is `suspend` and `loop()` awaits it, so a handler's iteration stays outstanding for the whole of whatever it suspends on — including a hop to another thread and back. Anything observing "is the bus busy" therefore transitively observes work a handler dispatched elsewhere, and needs no separate view of that other queue #order-dependent.
+- [invariant] `EventHandler.handle` is `suspend` and `dispatch` awaits it, so a handler's iteration stays outstanding for the whole of whatever it suspends on — including a hop to another thread and back. Anything observing "is the bus busy" therefore transitively observes work a handler dispatched elsewhere, and needs no separate view of that other queue #order-dependent.
 - [trap] The same property is why nothing may block a thread waiting for the bus to quiesce while a handler is suspended waiting for *that* thread: the handler occupies the bus and neither side can proceed.
 - [fact] Handlers are discovered reflectively from `@HandlesEvent`-annotated member functions. A zero-parameter function takes its event type from the annotation; a one-parameter function takes it from the parameter type.
-- [fact] `dispose()` closes the channel, clears both handler maps, and disposes the context if it is `Disposable`.
+- [fact] `dispose()` disposes the queue (closing the channel and its context) and clears both handler maps. Enqueuing afterwards is dropped and logged at DEBUG rather than warned about, because at shutdown it is routine and the queue cannot tell that case from a caller holding a disposed bus.
+- [fact] `isIdle` and `awaitIdle()` report whether every enqueued event has finished dispatching. `isIdle` is a plain read and safe on the rendering thread; `awaitIdle()` suspends and must never be called from a handler, which would wait on itself.
 - [trap] Dispatch is reflective (`KCallable.call`) and never sets `isAccessible`, so a handler declared on a **private class** cannot be invoked. It compiles, registers without complaint, and throws `IllegalCallableAccessException` when its first event arrives.
 - [history] Handler invocation is wrapped in a per-handler `try`/`catch` that logs and continues. Before that, an exception escaping any handler cancelled the loop coroutine and **the bus stopped dispatching for the rest of the process** — which presents as the application quietly freezing rather than as an error, and is the shape of several long-standing "had to restart it" reports #silent-failure.
 - [invariant] That `catch` rethrows `CancellationException` before catching `Exception`. Swallowing it would break shutdown, since cancellation is how the loop is meant to stop.

@@ -69,7 +69,7 @@ class EventBusTest : FunSpec({
         val recorder = Recorder()
         bus.registerHandlers(recorder)
 
-        bus.enqueueEventSync(ValueEvent(42))
+        bus.enqueueEvent(ValueEvent(42))
         testCoroutineScheduler.advanceUntilIdle()
 
         recorder.seen shouldContainExactly listOf("value:42")
@@ -82,11 +82,11 @@ class EventBusTest : FunSpec({
 
         // Positive control first: the handler does fire for its own exact type, so an empty result below
         // means "subclass was not matched" rather than "registration never worked".
-        bus.enqueueEventSync(BaseEvent())
+        bus.enqueueEvent(BaseEvent())
         testCoroutineScheduler.advanceUntilIdle()
         recorder.seen shouldContainExactly listOf("base")
 
-        bus.enqueueEventSync(DerivedEvent())
+        bus.enqueueEvent(DerivedEvent())
         testCoroutineScheduler.advanceUntilIdle()
 
         recorder.seen shouldContainExactly listOf("base")
@@ -98,12 +98,12 @@ class EventBusTest : FunSpec({
         bus.registerHandlers(recorder)
         bus.registerHandlers(recorder)
 
-        bus.enqueueEventSync(ValueEvent(1))
+        bus.enqueueEvent(ValueEvent(1))
         testCoroutineScheduler.advanceUntilIdle()
         recorder.seen shouldContainExactly listOf("value:1", "value:1")
 
         bus.unregisterHandlers(recorder)
-        bus.enqueueEventSync(ValueEvent(2))
+        bus.enqueueEvent(ValueEvent(2))
         testCoroutineScheduler.advanceUntilIdle()
 
         recorder.seen shouldContainExactly listOf("value:1", "value:1", "value:2")
@@ -114,7 +114,7 @@ class EventBusTest : FunSpec({
         val recorder = Recorder()
         bus.registerHandlers(recorder)
 
-        (1..5).forEach { bus.enqueueEventSync(ValueEvent(it)) }
+        (1..5).forEach { bus.enqueueEvent(ValueEvent(it)) }
         testCoroutineScheduler.advanceUntilIdle()
 
         recorder.seen shouldContainExactly (1..5).map { "value:$it" }
@@ -127,8 +127,8 @@ class EventBusTest : FunSpec({
         val recorder = SuspendingRecorder()
         bus.registerHandlers(recorder)
 
-        bus.enqueueEventSync(ValueEvent(1))
-        bus.enqueueEventSync(ValueEvent(2))
+        bus.enqueueEvent(ValueEvent(1))
+        bus.enqueueEvent(ValueEvent(2))
         testCoroutineScheduler.advanceUntilIdle()
 
         recorder.seen shouldContainExactly listOf("enter:1", "exit:1", "enter:2", "exit:2")
@@ -143,9 +143,9 @@ class EventBusTest : FunSpec({
             val recorder = ThrowingRecorder()
             bus.registerHandlers(recorder)
 
-            bus.enqueueEventSync(ValueEvent(1))
+            bus.enqueueEvent(ValueEvent(1))
             testCoroutineScheduler.advanceUntilIdle()
-            bus.enqueueEventSync(ValueEvent(2))
+            bus.enqueueEvent(ValueEvent(2))
             testCoroutineScheduler.advanceUntilIdle()
 
             recorder.seen shouldContainExactly listOf("value:1", "value:2")
@@ -165,7 +165,7 @@ class EventBusTest : FunSpec({
             // Re-register AFTER disposing, so this cannot pass merely because dispose() also clears the handler
             // map. The only thing left that can stop delivery is the channel being closed and the loop gone.
             bus.registerHandlers(recorder)
-            bus.enqueueEventSync(ValueEvent(1))
+            bus.enqueueEvent(ValueEvent(1))
             testCoroutineScheduler.advanceUntilIdle()
 
             recorder.seen shouldBe emptyList()

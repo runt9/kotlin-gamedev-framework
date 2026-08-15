@@ -32,7 +32,7 @@ abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
         if (!this@GameStateService::gameState.isInitialized || forceUpdate || gameState != this@GameStateService.gameState) {
             logger.debug { "Saving game state" }
             this@GameStateService.gameState = gameState
-            eventBus.enqueueEventSync(updatedEvent(gameState.clone() as T))
+            eventBus.enqueueEvent(updatedEvent(gameState.clone() as T))
             stateService.saveState(gameState)
         }
     }
