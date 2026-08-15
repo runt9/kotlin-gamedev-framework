@@ -29,6 +29,27 @@ The extension point the whole framework hangs off: a consumer registers intercep
 - [fact] `InterceptorHolder.addInterceptor` casts `Interceptor<T>` to `Interceptor<InterceptableContext>` under a file-level `@Suppress("UNCHECKED_CAST")`, so the compiler cannot catch a mismatch and `canIntercept` is the only guard standing between a wrong context and a bad cast at dispatch.
 - [trap] **Four functions are named `intercept` and two share arity.** The top-level factory `intercept(hook, lambda)` *builds* an `Interceptor`; the method `InterceptableContext.intercept(hook, context)` *dispatches*. `OnChangeInterceptable.onChange` calls the factory — a reader skimming for dispatch sites will misread it.
 - [trap] `InterceptableContext.intercept(hook, context)` iterates `context.interceptors[hook]` and invokes every one **with no `canIntercept` check at all**, unlike the single-argument `intercept(hook)` which filters. Whether exact-class matching applies therefore depends on which overload the caller used.
+
+The four `intercept`-named declarations, registration through to both dispatch paths — this is the shape a skimming reader misreads:
+
+```mermaid
+flowchart TD
+    Reg["Consumer: addInterceptor(hook) { ctx: T -> ... }\n3-arg overload on InterceptorHolder"]
+    Reg --> Factory["top-level intercept(hook, interceptorFn)\nInterceptor.kt:10 -- BUILDS an Interceptor of T\ncanIntercept = context::class == T::class"]
+    Factory --> Store["stored in interceptors map, keyed by hook\nInterceptorHolder.interceptors"]
+
+    Store --> Dispatch1
+    Store --> Dispatch2
+
+    Dispatch1["ctx.intercept(hook)\n1-arg -- InterceptableContext.kt:5\nFILTERING dispatch"]
+    Dispatch1 --> Check{"canIntercept(ctx):\nctx::class == T::class ?"}
+    Check -->|"true"| Run1["interceptor.intercept(ctx) runs"]
+    Check -->|"false"| Skip["silently skipped -- no error, no log"]
+
+    Dispatch2["ctx.intercept(hook, context)\n2-arg -- InterceptableContext.kt:9\nNON-FILTERING dispatch"]
+    Dispatch2 --> RunAll["every interceptor for hook runs unconditionally\nno canIntercept call at all"]
+```
+
 - [fact] As of this reading, nothing in kgdfw calls the non-filtering two-argument overload, and a survey of a consuming project found none either — all 29 of its dispatch sites use the single-arg form or their own wrapper. It is dead API rather than a live hazard, but it will bypass matching if someone reaches for it.
 - [fact] Interceptors are stored as `MutableMap<InterceptorHook, MutableSet<Interceptor<InterceptableContext>>>`, keyed per hook.
 - [trap] The `intercept()` factory returns a fresh anonymous `object : Interceptor<T>` on every call, with default identity equality, so the backing `MutableSet` does **not** deduplicate logically-identical registrations. Registering the same interceptor twice yields two members and it fires twice #silent-failure.
