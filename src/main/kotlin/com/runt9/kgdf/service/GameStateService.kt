@@ -6,11 +6,11 @@ import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.event.GameStateUpdated
 import com.runt9.kgdf.game.GameState
 import com.runt9.kgdf.log.kgdfLogger
-import com.runt9.kgdf.service.ServiceAsync.launchOnServiceThread
 
 abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
     private val eventBus: EventBus,
-    private val stateService: SingleFileSaveStateService<T>
+    private val stateService: SingleFileSaveStateService<T>,
+    private val serviceAsync: ServiceAsync
 ) {
     private val logger = kgdfLogger()
     private lateinit var gameState: T
@@ -37,7 +37,7 @@ abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
         }
     }
 
-    fun updateAsync(forceUpdate: Boolean = false, update: T.() -> Unit) = launchOnServiceThread {
+    fun updateAsync(forceUpdate: Boolean = false, update: T.() -> Unit) = serviceAsync.launchOnServiceThread {
         update(forceUpdate, update)
     }
 

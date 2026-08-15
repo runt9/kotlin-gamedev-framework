@@ -54,14 +54,15 @@ Three coupled concerns: how events are dispatched, which named thread work lands
 ### Threads
 
 - [fact] `AsyncFactory.newAsyncContext(name)` returns `newSingleThreadAsyncContext(name)` — every context it hands out is a single thread. It is `open`, so tests can substitute a deterministic scheduler.
-- [fact] `ServiceAsync.serviceContext` is a single thread named `Service-Thread`, exposed as `launchOnServiceThread` (fire and forget) and `onServiceThread` (suspending `withContext`).
+- [fact] `ServiceAsync` owns a single thread named `Service-Thread`, exposed as `launchOnServiceThread` (fire and forget) and `onServiceThread` (suspending `withContext`). It is an injected class taking an [AsyncFactory], not an object, so a test can substitute a scheduler and drain it.
+- [decision] **Finding no callers for `ServiceAsync` or `updateAsync` is expected and is not grounds for deleting them.** Turn-based consumers have nothing to put on a background service thread, because everything they do is reachable from the render loop. Real-time consumers are what it exists for. This has been proposed for deletion once on a zero-callers argument; the answer is no.
 
 ### GameStateService
 
 - [trap] `load()` returns `gameState.clone()`, **not** the cached instance. Mutating what `load()` gave you changes nothing until `save()` — except for whatever the consumer's `clone()` leaves shallow, which is visible immediately and permanently.
 - [trap] `save(state, forceUpdate = false)` **silently does nothing** when the state is already initialised, `forceUpdate` is false, and `state == cachedState`. Whether a mutation is detected therefore depends entirely on the consumer's `equals` #silent-failure. If a mutable object inside the state has identity-ish equality, mutating it is invisible here and the write is dropped — pass `forceUpdate = true` on any path that mutates such an object.
 - [fact] `update(forceUpdate) { }` is **fully synchronous**: it is `load().apply { update(); save(this, forceUpdate) }`, running on the calling thread and returning after the save.
-- [fact] `updateAsync(forceUpdate) { }` is the same call wrapped in `launchOnServiceThread`, i.e. fire-and-forget on `Service-Thread`.
+- [fact] `updateAsync(forceUpdate) { }` is the same call wrapped in the injected `ServiceAsync.launchOnServiceThread`, i.e. fire-and-forget on `Service-Thread`. Because that context now comes from `AsyncFactory`, a test scheduler drains it like any other.
 - [fact] `save` enqueues the consumer's `updatedEvent(clone)` onto the EventBus before writing to disk.
 - [fact] `load()` initialises from `stateService.loadState()` when a save file exists, otherwise builds `initNewState()` and immediately saves it.
 

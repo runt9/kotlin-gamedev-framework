@@ -14,6 +14,7 @@ import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.event.EventBus
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
+import com.runt9.kgdf.service.ServiceAsync
 import com.runt9.kgdf.ui.DialogManager
 import ktx.inject.Context
 import ktx.inject.register
@@ -52,6 +53,7 @@ object Injector {
     fun initStartupDeps() = ctx.register {
         bindSingleton<ApplicationConfiguration>()
         bindSingleton<AsyncFactory>()
+        bindSingleton<ServiceAsync>()
         bindSingleton<EventBus>()
         bindSingleton<AssetConfig>()
         bindSingleton<SkinLoader>()
