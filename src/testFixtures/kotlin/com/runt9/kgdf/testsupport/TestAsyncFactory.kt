@@ -8,9 +8,10 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 /**
  * Routes kgdfw's async contexts through the test's [TestCoroutineScheduler] so `advanceUntilIdle()` drains them.
  *
- * Only covers contexts created through [AsyncFactory]. Anything calling `newSingleThreadAsyncContext` directly
- * still runs on a real thread, and a test seeing stale state after such a call is hitting that gap, not a bug
- * here. Nothing in kgdfw does that any more, so the gap is only reachable by consumer code that builds its own.
+ * Only covers contexts created through [AsyncFactory], which is every context in kgdfw — `AsyncFactory` itself is
+ * the sole caller of `newSingleThreadAsyncContext`. Keep it that way: a context built directly runs on a real
+ * thread no scheduler can drain, and a test seeing stale state afterward is hitting that gap rather than a bug
+ * here. Consumer code can still open it.
  */
 class TestAsyncFactory(private val scheduler: TestCoroutineScheduler) : AsyncFactory() {
     override fun newAsyncContext(threadName: String): CoroutineDispatcher = StandardTestDispatcher(scheduler, threadName)

@@ -38,12 +38,13 @@ These are the framework's highest-cost surprises, kept here in one line each so 
 
 ## The split with consuming projects
 
-**This KB owns the mechanism; the consuming project's KB owns the usage.** What `canIntercept` compares belongs here. Which of RogueFlip's effects got it wrong belongs in RogueFlip's KB, which links across rather than restating. Cross-repo references are written as an explicit relative path in prose, never as a
-`[[wikilink]]` that cannot resolve in this corpus.
+**This KB owns the mechanism; the consuming project's KB owns the usage.** What `canIntercept` compares belongs here. Which of RogueFlip's effects got it wrong belongs in RogueFlip's KB, which links across rather than restating.
 
-RogueFlip's copy lives at `/home/avester/development/rogueflip/.claude/reference/`, a sibling of this
-repository. Both moved from `/mnt/c/Users/runt9/IdeaProjects/` into native WSL on 2026-08-15; the old
-checkouts are dead and must not be read.
+**The edge is one-way: a consumer links in, this repository never links out.** No `[[wikilink]]` to a
+consuming corpus, and no relative path to one either — a path names a project this repository is not
+supposed to know about and rots the moment that project moves the file. If a fact here can only be
+justified by pointing at a specific downstream repository, it is usage rather than mechanism and belongs
+there. See `.claude/reference/README.md` for the full statement of this rule.
 
 ## Working here
 

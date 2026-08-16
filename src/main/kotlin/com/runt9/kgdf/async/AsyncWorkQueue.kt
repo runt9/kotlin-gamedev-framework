@@ -4,6 +4,8 @@ import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
 import kotlinx.coroutines.flow.StateFlow
@@ -88,6 +90,10 @@ class AsyncWorkQueue<T>(
      * Once disposed, the queue cannot be used afterward. Unlike [stop], this zeroes the count, because once the
      * channel is closed and the thread is gone nothing can drain what is left, and a count stuck above zero
      * hangs every later [awaitIdle].
+     *
+     * "Cannot be used" is enforced on [submit], which drops and logs. [start] is *not* rejected, it relaunches a
+     * consumer over a closed channel, which exits immediately, so the call is inert rather than harmful. No caller
+     * does this today; guard it if one ever needs to.
      */
     override fun dispose() {
         queue.close()
@@ -102,7 +108,11 @@ class AsyncWorkQueue<T>(
         // either -- hasNext suspends, so the thread is released until an item arrives or the channel closes.
         for (item in queue) {
             try {
-                handleItem(item)
+                // stop() still ends the loop, just at the next receive() rather than mid-handler. An item that has
+                // started is usually past a side effect already, and killing it there loses the work while the
+                // exit() below still counts it as handled. In exchange, cancellation is no longer an escape from
+                // a stuck handler: anything doing I/O here owes itself a timeout.
+                withContext(NonCancellable) { handleItem(item) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {

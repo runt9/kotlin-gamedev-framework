@@ -16,8 +16,8 @@ import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * Driven through [TestAsyncFactory] rather than a real thread, which is the property the queue exists to give its
- * consumers: `EventBus` and `MetricsService` both build their context directly today and neither can be drained
- * deterministically as a result.
+ * consumers: `EventBus` and `MetricsService` both take their context from `AsyncFactory` through this queue, so a
+ * test scheduler drains them deterministically.
  */
 class AsyncWorkQueueTest : FunSpec({
     class Handler(private val onEach: (String) -> Unit = {}) {
@@ -114,6 +114,31 @@ class AsyncWorkQueueTest : FunSpec({
             handler.handled shouldContainExactly listOf("after")
             queue.pending.value shouldBe 0
             sink.messagesAt(LogLevel.ERROR).any { "handler failed; queue continues" in it } shouldBe true
+        }
+    }
+
+    // The live case is MetricsService, whose stop() runs on every exit from the run screen: cancelling mid-POST
+    // loses the metric and still counts it as handled.
+    test("stop lets the in-flight item finish rather than cancelling it mid-handle").config(coroutineTestScope = true) {
+        runTest {
+            val order = CopyOnWriteArrayList<String>()
+            val queue = AsyncWorkQueue<String>(TestAsyncFactory(testScheduler), "Test-Thread") { item ->
+                order += "enter:$item"
+                delay(50.milliseconds)
+                order += "exit:$item"
+            }
+            queue.start()
+
+            queue.submit("inflight")
+            // Far enough in to be inside the handler, not far enough to leave it.
+            testScheduler.advanceTimeBy(10.milliseconds)
+            order shouldContainExactly listOf("enter:inflight")
+
+            queue.stop()
+            testScheduler.advanceUntilIdle()
+
+            order shouldContainExactly listOf("enter:inflight", "exit:inflight")
+            queue.pending.value shouldBe 0
         }
     }
 
