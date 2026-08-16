@@ -28,6 +28,14 @@ abstract class GameStateService<T : GameState, E : GameStateUpdated<T>>(
         return gameState.clone() as T
     }
 
+    /**
+     * The state already in memory, or null if nothing has loaded one yet.
+     *
+     * Unlike [load] this never initializes and never writes a save file, so an observer -- a debug overlay, an
+     * automation harness -- cannot bring a run into existence merely by asking whether one exists.
+     */
+    fun peek(): T? = if (this@GameStateService::gameState.isInitialized) gameState.clone() as T else null
+
     fun save(gameState: T, forceUpdate: Boolean = false) {
         if (!this@GameStateService::gameState.isInitialized || forceUpdate || gameState != this@GameStateService.gameState) {
             logger.debug { "Saving game state" }
