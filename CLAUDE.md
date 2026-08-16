@@ -40,14 +40,10 @@ These are the framework's highest-cost surprises, kept here in one line each so 
 
 **This KB owns the mechanism; the consuming project's KB owns the usage.** What `canIntercept` compares belongs here. Which of RogueFlip's effects got it wrong belongs in RogueFlip's KB, which links across rather than restating.
 
-**The edge is one-way: a consumer links in, this repository never links out.** No `[[wikilink]]` to a
-consuming corpus, and no relative path to one either — a path names a project this repository is not
-supposed to know about and rots the moment that project moves the file. If a fact here can only be
-justified by pointing at a specific downstream repository, it is usage rather than mechanism and belongs
-there. See `.claude/reference/README.md` for the full statement of this rule.
+**The edge is one-way: a consumer links in, this repository never links out.** No `[[wikilink]]` to a consuming corpus, and no relative path to one either — a path names a project this repository is not supposed to know about and rots the moment that project moves the file. If a fact here can only be justified by pointing at a specific downstream repository, it is usage rather than mechanism and belongs there. See `.claude/reference/README.md` for the full statement of this rule.
 
 ## Working here
 
 - This framework is solely owned and maintained by the same person who owns RogueFlip. It is not off-limits: changes and improvements are welcome, and it is easy to test and deploy.
-- Consumers pin kgdfw by JitPack commit hash. A change here is not live in a consumer until that hash is bumped; `mavenLocal` plus the `kgdfVersion` property is the local iteration path.
+- Consumers pin kgdfw by JitPack version tag. A change here is not live in a consumer until a new semver tag is pushed and the consumer's pin is bumped to it; `mavenLocal` plus the `kgdfVersion` property is the local iteration path. Releasing is a `git tag` plus push — JitPack builds the tag the first time anything resolves it, which takes a few minutes.
 - Because there is exactly one consumer today, "nothing calls this" is cheap to establish and worth recording when you find it — several APIs here are dead rather than dangerous.
