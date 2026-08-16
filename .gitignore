@@ -4,6 +4,7 @@
 # Project exclude paths
 /build
 .agentbridge
+out/
 
 # Python bytecode from .claude/reference/_validate.py
 __pycache__/

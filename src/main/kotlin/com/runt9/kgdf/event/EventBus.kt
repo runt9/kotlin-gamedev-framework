@@ -1,14 +1,13 @@
-@file:OptIn(DelicateCoroutinesApi::class)
-
 package com.runt9.kgdf.event
 
 import com.badlogic.gdx.utils.Disposable
 import com.runt9.kgdf.async.AsyncFactory
+import com.runt9.kgdf.async.AsyncWorkQueue
+import com.runt9.kgdf.async.WorkSource
 import com.runt9.kgdf.log.kgdfLogger
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
-import ktx.async.KtxAsync
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.StateFlow
+import java.lang.reflect.InvocationTargetException
 import kotlin.reflect.KClass
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.findAnnotation
@@ -19,22 +18,23 @@ import kotlin.reflect.jvm.jvmErasure
 
 
 @Suppress("UNCHECKED_CAST")
-class EventBus(asyncFactory: AsyncFactory) : Disposable {
+class EventBus(asyncFactory: AsyncFactory) : Disposable, WorkSource {
     private val logger = kgdfLogger()
-    private val asyncContext = asyncFactory.newAsyncContext("Event-Thread")
-    private val eventQueue = Channel<Event>()
+    private val queue = AsyncWorkQueue<Event>(asyncFactory, "Event-Thread", ::dispatch)
     private val eventHandlers = mutableMapOf<KClass<out Event>, MutableList<EventHandler<Event>>>()
     private val handlerClasses = mutableSetOf<ClassHandlerMapping>()
 
-    suspend fun <T : Event> enqueueEvent(event: T) {
-        logger.debug { "Enqueuing event $event" }
-        if (!eventQueue.isClosedForSend) {
-            eventQueue.send(event)
-        }
-    }
+    /** Whether every enqueued event has finished dispatching. A plain read, so it is safe on the rendering thread. */
+    override val isIdle get() = queue.isIdle
 
-    fun <T : Event> enqueueEventSync(event: T) {
-        KtxAsync.launch(asyncContext) { enqueueEvent(event) }
+    override val pending: StateFlow<Int> get() = queue.pending
+
+    /** Suspends until every enqueued event has finished dispatching. Never call this from a handler -- see [dispatch]. */
+    override suspend fun awaitIdle() = queue.awaitIdle()
+
+    fun <T : Event> enqueueEvent(event: T) {
+        logger.debug { "Enqueuing event $event" }
+        queue.submit(event)
     }
 
     fun registerHandlers(obj: Any) {
@@ -59,35 +59,35 @@ class EventBus(asyncFactory: AsyncFactory) : Disposable {
         eventHandlers[eventType]?.remove(handler)
     }
 
-    fun loop() {
-        KtxAsync.launch(asyncContext) {
-            logger.info { "Starting loop" }
-            while (!eventQueue.isClosedForReceive) {
-                eventQueue.receiveCatching().apply {
-                    if (isFailure) {
-                        if (exceptionOrNull() != null) {
-                            logger.error { "An error occurred while receiving event from queue. ${this.exceptionOrNull()}" }
-                        }
-                        return@launch
-                    }
+    fun loop() = queue.start()
 
-                    val event = getOrThrow()
-                    eventHandlers[event::class]?.toList()?.forEach {
-                        logger.debug { "Handling event ${event::class.simpleName}" }
-                        it.handle(event)
-                    }
-                }
+    /**
+     * Runs every handler for one event, in registration order, and does not return until they all have. That is
+     * what keeps dispatch strictly one-event-at-a-time even when a handler suspends, which several consumers
+     * depend on for ordering.
+     *
+     * A handler is caught individually rather than letting the queue's own per-item catch cover it, so one
+     * failing handler does not skip the others registered for the same event.
+     */
+    private suspend fun dispatch(event: Event) {
+        eventHandlers[event::class]?.toList()?.forEach {
+            logger.debug { "Handling event ${event::class.simpleName}" }
+            try {
+                it.handle(event)
+            } catch (e: CancellationException) {
+                throw e // shutdown — must not fall into the catch below
+            } catch (e: Exception) {
+                val cause = (e as? InvocationTargetException)?.cause ?: e
+                logger.error(cause) { "Handler for ${event::class.simpleName} failed; bus continues" }
             }
-            logger.info { "Loop complete." }
         }
     }
 
     override fun dispose() {
         logger.info { "Disposing" }
-        eventQueue.close()
+        queue.dispose()
         eventHandlers.clear()
         handlerClasses.clear()
-        (asyncContext as? Disposable)?.dispose()
     }
 
     private inner class ClassHandlerMapping(val obj: Any) {

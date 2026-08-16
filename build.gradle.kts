@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.versions)
     `maven-publish`
     `java-library`
+    `java-test-fixtures`
 }
 
 java {
@@ -63,7 +64,6 @@ dependencies {
         "graphics",
         "inject",
         "json",
-        "log",
         "math",
         "preferences",
         "reflect",
@@ -71,14 +71,42 @@ dependencies {
         "vis-style"
     )
 
-    testApi(kotlin("test"))
-    testApi(libs.junit.jupiter)
-    testApi(libs.assertk)
-    testApi(libs.mockk)
+    // testFixturesApi, not testApi: test-scoped dependencies are never published, so testApi reaches no consumer.
+    testFixturesApi(libs.kotest.framework.engine)
+    testFixturesApi(libs.kotest.assertions.core)
+    testFixturesApi(libs.kotest.runner.junit5)
+    testFixturesApi(libs.kotlinx.coroutines.test)
+
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {
     useJUnitPlatform()
+
+    // Incubating since 8.8. Kept in sync with RogueFlip's rf-common-plugin, which has the same block.
+    reports.junitXml.includeSystemOutLog.set(false)
+    reports.junitXml.includeSystemErrLog.set(false)
+
+    // Gradle prints counts only on failure, so a green run reads the same as one that executed
+    // nothing. addTestListener, not the afterSuite every example shows -- that is deprecated and
+    // goes away in Gradle 10. Keep `label` out of the listener or it captures the task.
+    val label = path
+    addTestListener(object : TestListener {
+        override fun beforeSuite(suite: TestDescriptor) = Unit
+        override fun beforeTest(test: TestDescriptor) = Unit
+        override fun afterTest(test: TestDescriptor, result: TestResult) = Unit
+
+        override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+            if (suite.parent != null) return // root suite only; it carries the task totals
+            println(
+                "TEST-SUMMARY $label ${result.resultType}" +
+                    " total=${result.testCount}" +
+                    " passed=${result.successfulTestCount}" +
+                    " failed=${result.failedTestCount}" +
+                    " skipped=${result.skippedTestCount}"
+            )
+        }
+    })
 }
 
 tasks.jar {
