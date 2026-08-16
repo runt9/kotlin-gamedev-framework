@@ -1,14 +1,19 @@
 [versions]
-kotlin = "2.2.21"
-kotlinxSerialization = "1.9.0"
-kotlinxCoroutines = "1.8.1"
-gdx = "1.13.5"
+kotlin = "2.4.10"
+kotlinxSerialization = "1.11.0"
+kotlinxCoroutines = "1.11.0"
+# KTX's newest release (1.13.1-rc1) officially targets libGDX 1.13.1, so anything past that is ahead of what KTX
+# was built against. Verify by booting the game, not by a green compile -- a KTX/libGDX mismatch surfaces as a
+# runtime NoSuchMethodError, which compiles perfectly.
+gdx = "1.14.2"
 gdxAi = "1.8.2"
 ktx = "1.13.1-rc1"
 korlibs = "4.0.10"
-kotest = "6.1.11"
-junitPlatformLauncher = "1.8.2"
-versionsPlugin = "0.51.0"
+kotest = "6.2.4"
+junitPlatformLauncher = "6.1.3"
+# Below 0.53.0 this plugin is broken on Gradle 9.3+: it calls LenientConfiguration.getFirstLevelModuleDependencies,
+# which was removed, and `dependencyUpdates` fails outright rather than degrading.
+versionsPlugin = "0.61.0"
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
@@ -16,9 +21,9 @@ kotlinx-serialization-cbor = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 gdx-ai = { module = "com.badlogicgames.gdx:gdx-ai", version.ref = "gdxAi" }
 freetype-stripe = { module = "com.github.raeleus.stripe:freetype", version = "2.0.0" }
-kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "7.0.3" }
-slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.17" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.5.23" }
+kotlin-logging = { module = "io.github.oshai:kotlin-logging-jvm", version = "8.0.4" }
+slf4j-api = { module = "org.slf4j:slf4j-api", version = "2.0.18" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version = "1.6.3" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "kotest" }
 kotest-framework-engine = { module = "io.kotest:kotest-framework-engine-jvm", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
