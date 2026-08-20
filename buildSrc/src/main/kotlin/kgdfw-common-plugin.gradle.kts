@@ -1,13 +1,21 @@
+import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.versions)
-    `maven-publish`
+    kotlin("jvm")
+    kotlin("plugin.serialization")
     `java-library`
     `java-test-fixtures`
+    `maven-publish`
+    // Every module gets coverage tasks: `gradlew :<module>:koverXmlReport` (machine-readable, what tooling and
+    // agents check) and `:koverHtmlReport` (browsable). Reports land in <module>/build/reports/kover/.
+    id("org.jetbrains.kotlinx.kover")
+    // Every module gets `gradlew :<module>:dependencyUpdates`. Applied here rather than at the root because
+    // kgdfw has no root build script to hang it off, and the root project declares no dependencies to report on.
+    // io.github, not com.github: the plugin moved namespace and the old id is deprecated, though the artifact
+    // has been published under io.github.ben-manes for a while.
+    id("io.github.ben-manes.versions")
 }
 
 java {
@@ -20,64 +28,9 @@ kotlin {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven("https://oss.sonatype.org/content/repositories/releases/")
     maven("https://jitpack.io")
-}
-
-fun DependencyHandlerScope.apiKotlin(vararg names: String) = names.forEach { api(kotlin(it)) }
-
-fun DependencyHandlerScope.apiGdx(vararg names: String, classifier: String = "") =
-    names.forEach { api(group = "com.badlogicgames.gdx", name = it, version = libs.versions.gdx.get(), classifier = classifier) }
-
-fun DependencyHandlerScope.apiGdxNative(vararg names: String) = apiGdx(classifier = "natives-desktop", names = names)
-fun DependencyHandlerScope.apiKtx(vararg names: String) =
-    names.forEach { api(group = "io.github.libktx", name = "ktx-$it", version = libs.versions.ktx.get()) }
-
-fun DependencyHandlerScope.apiKorlibs(vararg names: String) =
-    names.forEach { api(group = "com.soywiz.korlibs.$it", name = "$it-jvm", version = libs.versions.korlibs.get()) }
-
-dependencies {
-    apiKotlin("stdlib", "reflect")
-    api(libs.kotlinx.serialization.json)
-    api(libs.kotlinx.serialization.cbor)
-    api(libs.kotlinx.coroutines.core)
-    apiGdx("gdx", "gdx-freetype", "gdx-backend-lwjgl3")
-    apiGdxNative("gdx-platform", "gdx-freetype-platform")
-    api(libs.gdx.ai)
-    apiKorlibs("klock")
-    api(libs.freetype.stripe)
-    api(libs.kotlin.logging)
-    api(libs.slf4j.api)
-    api(libs.logback.classic)
-
-    apiKtx(
-        "app",
-        "actors",
-        "assets",
-        "assets-async",
-        "async",
-        "collections",
-        "freetype",
-        "freetype-async",
-        "graphics",
-        "inject",
-        "json",
-        "math",
-        "preferences",
-        "reflect",
-        "vis",
-        "vis-style"
-    )
-
-    // testFixturesApi, not testApi: test-scoped dependencies are never published, so testApi reaches no consumer.
-    testFixturesApi(libs.kotest.framework.engine)
-    testFixturesApi(libs.kotest.assertions.core)
-    testFixturesApi(libs.kotest.runner.junit5)
-    testFixturesApi(libs.kotlinx.coroutines.test)
-
-    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 tasks.test {
@@ -107,6 +60,17 @@ tasks.test {
             )
         }
     })
+}
+
+kover {
+    // useJacoco inside a kover block is not a contradiction: Kover keeps the DSL and reporting, and only the
+    // instrumentation engine changes. JetBrains discontinued their own agent (kotlinx-kover#720) in favor of
+    // JaCoCo (#746); RogueFlip measured the difference on :simulator, and rf-common-plugin carries the numbers.
+    //
+    // Precompiled script plugins get no generated `libs` accessor, hence the explicit lookup. `.get()` is
+    // deliberate: a missing `jacoco` entry must fail the build rather than silently default.
+    val jacocoVersion = the<VersionCatalogsExtension>().named("libs").findVersion("jacoco").get().requiredVersion
+    useJacoco(jacocoVersion)
 }
 
 tasks.jar {

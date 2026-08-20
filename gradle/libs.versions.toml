@@ -1,5 +1,4 @@
 [versions]
-kotlin = "2.4.10"
 kotlinxSerialization = "1.11.0"
 kotlinxCoroutines = "1.11.0"
 # KTX's newest release (1.13.1-rc1) officially targets libGDX 1.13.1, so anything past that is ahead of what KTX
@@ -11,9 +10,13 @@ ktx = "1.13.1-rc1"
 korlibs = "4.0.10"
 kotest = "6.2.4"
 junitPlatformLauncher = "6.1.3"
-# Below 0.53.0 this plugin is broken on Gradle 9.3+: it calls LenientConfiguration.getFirstLevelModuleDependencies,
-# which was removed, and `dependencyUpdates` fails outright rather than degrading.
-versionsPlugin = "0.61.0"
+# Coverage engine behind Kover. IntelliJ reports this as unused and is wrong: kgdfw-common-plugin reads it via
+# VersionCatalogsExtension, which the IDE cannot see, because precompiled script plugins get no generated
+# accessor. Kept in step with RogueFlip's pin.
+jacoco = "0.8.15"
+
+# No [plugins] section, and no `kotlin` version: every plugin is applied by kgdfw-common-plugin, which resolves
+# them from buildSrc's own catalog and classpath. An alias or a version.ref here would serve nobody.
 
 [libraries]
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
@@ -29,8 +32,3 @@ kotest-framework-engine = { module = "io.kotest:kotest-framework-engine-jvm", ve
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junitPlatformLauncher" }
-
-[plugins]
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-versions = { id = "com.github.ben-manes.versions", version.ref = "versionsPlugin" }

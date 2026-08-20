@@ -1,0 +1,15 @@
+[versions]
+kotlin = "2.4.10"
+kover = "0.9.9"
+# Below 0.53.0 this is broken on Gradle 9.3+ (calls a LenientConfiguration method that was removed) and
+# `dependencyUpdates` fails outright. Kept in step with RogueFlip's buildSrc catalog, which is the real twin;
+# the root catalog declares no plugin versions at all.
+versionsPlugin = "0.61.0"
+
+[libraries]
+kotlinPlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinxSerializationPlugin = { module = "org.jetbrains.kotlin.plugin.serialization:org.jetbrains.kotlin.plugin.serialization.gradle.plugin", version.ref = "kotlin" }
+# Coverage. Kover supplies the Gradle DSL and report generation; the actual instrumentation is JaCoCo, selected
+# via `useJacoco` in kgdfw-common-plugin (see the reasoning there). The two are not alternatives here.
+koverPlugin = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
+benManesPlugin = { module = "io.github.ben-manes.versions:io.github.ben-manes.versions.gradle.plugin", version.ref = "versionsPlugin" }
