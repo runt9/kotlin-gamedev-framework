@@ -12,6 +12,7 @@ import com.runt9.kgdf.asset.SkinLoader
 import com.runt9.kgdf.asset.SoundService
 import com.runt9.kgdf.async.AsyncFactory
 import com.runt9.kgdf.event.EventBus
+import com.runt9.kgdf.input.InputTrackingService
 import com.runt9.kgdf.service.GameInitializer
 import com.runt9.kgdf.service.GameServiceRegistry
 import com.runt9.kgdf.service.ServiceAsync
@@ -75,6 +76,7 @@ object Injector {
 
     fun initRunningDeps() = ctx.register {
         bindSingleton(InputMultiplexer())
+        bindSingleton(InputTrackingService())
         bindSingleton(GdxAI.getTimepiece())
 
         bindSingleton<GameServiceRegistry>()

@@ -8,13 +8,8 @@ plugins {
     `java-library`
     `java-test-fixtures`
     `maven-publish`
-    // Every module gets coverage tasks: `gradlew :<module>:koverXmlReport` (machine-readable, what tooling and
-    // agents check) and `:koverHtmlReport` (browsable). Reports land in <module>/build/reports/kover/.
     id("org.jetbrains.kotlinx.kover")
-    // Every module gets `gradlew :<module>:dependencyUpdates`. Applied here rather than at the root because
-    // kgdfw has no root build script to hang it off, and the root project declares no dependencies to report on.
-    // io.github, not com.github: the plugin moved namespace and the old id is deprecated, though the artifact
-    // has been published under io.github.ben-manes for a while.
+    // io.github, not com.github: the plugin moved namespace and the old id is deprecated.
     id("io.github.ben-manes.versions")
 }
 
@@ -36,7 +31,7 @@ repositories {
 tasks.test {
     useJUnitPlatform()
 
-    // Incubating since 8.8. Kept in sync with RogueFlip's rf-common-plugin, which has the same block.
+    // Incubating since 8.8.
     reports.junitXml.includeSystemOutLog.set(false)
     reports.junitXml.includeSystemErrLog.set(false)
 
@@ -65,7 +60,7 @@ tasks.test {
 kover {
     // useJacoco inside a kover block is not a contradiction: Kover keeps the DSL and reporting, and only the
     // instrumentation engine changes. JetBrains discontinued their own agent (kotlinx-kover#720) in favor of
-    // JaCoCo (#746); RogueFlip measured the difference on :simulator, and rf-common-plugin carries the numbers.
+    // JaCoCo (#746).
     //
     // Precompiled script plugins get no generated `libs` accessor, hence the explicit lookup. `.get()` is
     // deliberate: a missing `jacoco` entry must fail the build rather than silently default.

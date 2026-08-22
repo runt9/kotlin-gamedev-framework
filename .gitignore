@@ -1,7 +1,6 @@
 /.idea
 *.iml
-# Not root-anchored: with core/, mcp/ and buildSrc/ each producing their own, a leading slash would ignore
-# only the root's and commit every module's build output.
+# Not root-anchored: a leading slash ignores only the root's build output and commits every module's.
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar

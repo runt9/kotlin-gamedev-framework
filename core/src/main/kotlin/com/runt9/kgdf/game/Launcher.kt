@@ -7,6 +7,7 @@ import com.runt9.kgdf.asset.AssetRegistry
 import com.runt9.kgdf.ext.inject
 import com.runt9.kgdf.inject.AdditionalInjectorDependencies
 import com.runt9.kgdf.inject.Injector
+import com.runt9.kgdf.input.FocusTrackingWindowListener
 import com.runt9.kgdf.settings.PlayerSettingsConfig
 
 object Launcher {
@@ -23,6 +24,9 @@ object Launcher {
         Injector.bindSingleton(gameConfig)
         AssetRegistry.registerAssets(assets)
         Injector.initStartupDeps()
-        Lwjgl3Application(inject<T>(), inject<ApplicationConfiguration>())
+
+        val config = inject<ApplicationConfiguration>()
+        config.setWindowListener(FocusTrackingWindowListener())
+        Lwjgl3Application(inject<T>(), config)
     }
 }

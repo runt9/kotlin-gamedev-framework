@@ -2,15 +2,14 @@ plugins {
     id("kgdfw-common-plugin")
 }
 
-// These stay in a module build script rather than moving to the convention plugin: they read
-// `libs.versions.*`, and generated version-catalog accessors exist in build scripts but NOT in precompiled
-// script plugins. Moving them costs three VersionCatalogsExtension lookups and buys nothing.
+// These cannot move to the convention plugin: they read `libs.versions.*`, and generated catalog accessors
+// exist in build scripts but not in precompiled script plugins.
 fun DependencyHandlerScope.apiKotlin(vararg names: String) = names.forEach { api(kotlin(it)) }
 
 fun DependencyHandlerScope.apiGdx(vararg names: String, classifier: String = "") {
     val version = libs.versions.gdx.get()
-    // Single-string notation is `group:name:version[:classifier]`, so an empty classifier has to omit the
-    // separator entirely -- a trailing colon is not the same coordinate and resolves to nothing.
+    // An empty classifier must omit the separator: a trailing colon is a different coordinate and resolves
+    // to nothing.
     val suffix = if (classifier.isEmpty()) "" else ":$classifier"
     names.forEach { api("com.badlogicgames.gdx:$it:$version$suffix") }
 }
