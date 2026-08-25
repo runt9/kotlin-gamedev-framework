@@ -1,17 +1,39 @@
 package com.runt9.kgdf.mcp.observe
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.scenes.scene2d.Stage
+import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.game.KgdfGame
-import com.runt9.kgdf.ui.core.BaseScreen
-import com.runt9.kgdf.ui.core.BasicStage
+import com.runt9.kgdf.ui.view.DialogView
 
 /**
- * The stages currently taking input. Dialogs need no separate lookup: `DialogManager` shows them on the
- * screen's own stage.
- *
- * Empty means no screen is showing, which is a result to report rather than a failure.
+ * Which screen the player is on. **Screen here means screen or topmost open dialog**, which is what a player
+ * means by it too.
  */
-fun shownScreenStages(): List<BasicStage> {
-    val game = Gdx.app?.applicationListener as? KgdfGame ?: return emptyList()
-    return (game.shownScreen as? BaseScreen)?.stages ?: emptyList()
+object ShownScreen {
+    private val multiplexer by lazyInject<InputMultiplexer>()
+
+    /**
+     * The stage currently receiving input, or null when nothing is showing.
+     *
+     * Read from the multiplexer because that is the list dispatch itself walks, so nothing is live here without
+     * being live for a real click too. **Last wins** — later processors sit on top.
+     */
+    fun stage(): Stage? = multiplexer.processors.filterIsInstance<Stage>().lastOrNull()
+
+    /**
+     * The topmost open dialog if there is one, otherwise the screen behind it. This is the key a game registers
+     * its observers against.
+     *
+     * Named by controller rather than view, because the controller is the type the rest of a game refers to a
+     * screen by.
+     */
+    fun Stage.currentScreenName(): String? {
+        root.children.filterIsInstance<DialogView>().lastOrNull { it.isVisible }
+            ?.let { return it.controller::class.simpleName }
+
+        val game = Gdx.app?.applicationListener as? KgdfGame ?: return null
+        return game.shownScreen::class.simpleName
+    }
 }
