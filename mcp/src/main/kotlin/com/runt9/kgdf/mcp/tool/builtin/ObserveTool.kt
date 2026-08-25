@@ -1,7 +1,7 @@
 package com.runt9.kgdf.mcp.tool.builtin
 
 import com.runt9.kgdf.mcp.observe.ShownScreen
-import com.runt9.kgdf.mcp.observe.ShownScreen.currentScreenName
+import com.runt9.kgdf.mcp.observe.ShownScreen.shownController
 import com.runt9.kgdf.mcp.tool.GameObserver
 import com.runt9.kgdf.mcp.tool.HarnessTool
 import com.runt9.kgdf.mcp.tool.RENDER_TIMEOUT
@@ -23,14 +23,14 @@ class ObserveTool(private val observer: GameObserver) : HarnessTool {
 
     override val description =
         "Read the current screen: what is on it and what you can do with it. Anything the player cannot see is " +
-            "absent rather than hidden, so a missing field means the screen does not show it."
+                "absent rather than hidden, so a missing field means the screen does not show it."
 
     /** Read in one render-thread hop, so an observation cannot describe two different frames. */
     override suspend fun call(): ToolOutput = withTimeout(RENDER_TIMEOUT) {
         onRenderingThread {
-            val screen = ShownScreen.stage()?.currentScreenName() ?: return@onRenderingThread ToolOutput.of(NothingShowing())
+            val screen = ShownScreen.stage()?.shownController() ?: return@onRenderingThread ToolOutput.of(NothingShowing())
 
-            observer.observe(screen) ?: ToolOutput.of(UnknownScreen(screen))
+            observer.observe(screen) ?: ToolOutput.of(UnknownScreen(screen::class.simpleName.orEmpty()))
         }
     }
 }
