@@ -22,7 +22,7 @@ object ScreenshotTool : HarnessTool {
      * **Returns the previous frame, not the current one.** Posted runnables drain before the render, so anything
      * that changed this frame is not in the image yet. Read [ObserveTool] rather than the pixels for state.
      */
-    override suspend fun call(): ToolOutput = withTimeout(RENDER_TIMEOUT) {
+    override suspend fun call(args: Map<String, String>): ToolOutput = withTimeout(RENDER_TIMEOUT) {
         onRenderingThread {
             val pixmap = Pixmap.createFromFrameBuffer(0, 0, Gdx.graphics.backBufferWidth, Gdx.graphics.backBufferHeight)
             try {

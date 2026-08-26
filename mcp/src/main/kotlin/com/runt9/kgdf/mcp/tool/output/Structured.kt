@@ -13,9 +13,11 @@ class Structured<T>(val value: T, val serializer: KSerializer<T>) : ToolOutput {
         /**
          * `encodeDefaults` matters: without it a property equal to its default is omitted, so a nullable field
          * disappears from the wire exactly when it is null and a client indexing it starts throwing.
+         *
+         * Not pretty-printed: on a measured payload, indentation was two thirds of the bytes. Pipe `curl`
+         * through `jq` when a human has to read one.
          */
         private val json = Json {
-            prettyPrint = true
             encodeDefaults = true
         }
     }
