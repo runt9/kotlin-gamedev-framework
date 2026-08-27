@@ -16,8 +16,6 @@ import com.runt9.kgdf.ui.view.DialogView
 object ShownScreen {
     private val multiplexer by lazyInject<InputMultiplexer>()
 
-    internal const val NOTHING_SHOWING = "no screen is showing"
-
     /**
      * The controller for the topmost open dialog if there is one, otherwise for the screen behind it. This is
      * both what a game keys its observers on and the instance they read.

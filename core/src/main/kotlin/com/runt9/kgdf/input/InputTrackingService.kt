@@ -48,13 +48,6 @@ class InputTrackingService {
     fun isHeld(code: InputCode) = isCodeHeld(code)
 
     /**
-     * What is bound to an action, for a caller that has to produce the input rather than react to it. Keeps the
-     * keymap the only place a code is named: a synthesized event asks what a real one would have carried.
-     */
-    fun codesFor(action: InputAction, trigger: InputTrigger) =
-        registrations.filter { it.action == action && it.trigger == trigger }.flatMap { it.codes }
-
-    /**
      * Whether any mouse button is down, which is not the same as any action being held: an action bound to a key
      * is held while a modifier alone is down. Deriving one from the other keeps a drag alive on a held modifier.
      */
