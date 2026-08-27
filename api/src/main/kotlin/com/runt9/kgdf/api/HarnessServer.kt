@@ -1,4 +1,4 @@
-package com.runt9.kgdf.mcp
+package com.runt9.kgdf.api
 
 import com.runt9.kgdf.log.kgdfLogger
 import io.ktor.server.cio.CIO

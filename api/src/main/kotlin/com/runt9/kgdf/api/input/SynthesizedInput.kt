@@ -1,9 +1,9 @@
-package com.runt9.kgdf.mcp.input
+package com.runt9.kgdf.api.input
 
 import com.badlogic.gdx.InputMultiplexer
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.input.InputCode
-import com.runt9.kgdf.mcp.observe.renderHop
+import com.runt9.kgdf.api.observe.renderHop
 
 /**
  * Turns a coordinate into the events a mouse or keyboard would have produced.

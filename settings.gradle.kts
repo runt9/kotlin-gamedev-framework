@@ -1,3 +1,3 @@
 rootProject.name = "kotlin-gamedev-framework"
 
-include("core", "mcp")
+include("core", "api")
