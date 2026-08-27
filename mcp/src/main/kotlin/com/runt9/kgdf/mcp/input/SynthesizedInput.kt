@@ -3,6 +3,7 @@ package com.runt9.kgdf.mcp.input
 import com.badlogic.gdx.InputMultiplexer
 import com.runt9.kgdf.ext.lazyInject
 import com.runt9.kgdf.input.InputCode
+import com.runt9.kgdf.mcp.observe.renderHop
 
 /**
  * Turns a coordinate into the events a mouse or keyboard would have produced.
@@ -10,14 +11,12 @@ import com.runt9.kgdf.input.InputCode
  * Everything goes through the injected `InputMultiplexer`, which is what a real device feeds, so a click a
  * dialog would have swallowed is swallowed here too and stop-at-first-consumer ordering is preserved. Reaching
  * past it into a screen's own handler would drive a path no player can reach.
- *
- * **Every method here must be called on the rendering thread.**
  */
-internal object SynthesizedInput {
+object SynthesizedInput {
     private val multiplexer by lazyInject<InputMultiplexer>()
 
     /** Coordinates straight from the caller, for driving from a screenshot. Nothing validates what is there. */
-    fun clickAt(x: Int, y: Int, button: InputCode.Button) = press(x, y, button, emptySet())
+    suspend fun clickAt(x: Int, y: Int, button: InputCode.Button) = renderHop { press(x, y, button, emptySet()) }
 
     /**
      * Modifiers are held across the press and released after it, all inside one render-thread hop, so synthetic
