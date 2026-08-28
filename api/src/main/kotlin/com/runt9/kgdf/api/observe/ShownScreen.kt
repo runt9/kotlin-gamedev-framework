@@ -10,6 +10,7 @@ import com.runt9.kgdf.ui.core.UiScreen
 import com.runt9.kgdf.ui.view.DialogView
 import kotlinx.coroutines.withTimeout
 import ktx.async.onRenderingThread
+import kotlin.reflect.KClass
 import kotlin.time.Duration.Companion.seconds
 
 /** Generous: a timeout here means the render loop stopped, which is worth surfacing rather than waiting out. */
