@@ -10,6 +10,15 @@ import kotlin.reflect.KClass
 
 abstract class ScreenApiController<T : Controller>(protected val controllerClass: KClass<T>) : ApiController() {
     /**
+     * The path this controller's endpoints hang off, taken from the screen enum that already pairs a route with
+     * the controller serving it. Spelling it again per controller is what lets the two drift.
+     *
+     * Resolved at object initialization, which is the first time anything touches `objectInstance` -- so every
+     * screen must already be registered by then, or this throws. Register screens before controllers.
+     */
+    protected val baseRoute = "/${ApiScreen.forController(controllerClass).route}"
+
+    /**
      * Resolves the live controller and runs [block] against it, both on the rendering thread.
      *
      * Resolution is inside the hop rather than before it so the screen cannot change between the check and the

@@ -25,6 +25,18 @@ interface ApiScreen {
         }
 
         /**
+         * The screen [controllerClass] serves, matched exactly rather than by [KClass.isInstance] as [of] does:
+         * this answers for a declared controller type, not for whatever object happens to be showing.
+         *
+         * Throws where [of] answers [DefaultApiScreen.UNKNOWN], because the two answers are read in different
+         * places. An unknown screen in a response is information. An unknown screen in a *route* silently binds
+         * every one of that controller's endpoints under `/unknown`, where each 404s with nothing saying why.
+         */
+        fun forController(controllerClass: KClass<out Controller>): ApiScreen =
+            screens.find { it.controller == controllerClass }
+                ?: error("No ApiScreen names ${controllerClass.simpleName}. Register screens before controllers.")
+
+        /**
          * Idempotent by identity, for the same reason as [com.runt9.kgdf.api.controller.ApiControllerRegistry]:
          * the list is process-global with no teardown, so a test JVM registering per spec must not accumulate.
          */
