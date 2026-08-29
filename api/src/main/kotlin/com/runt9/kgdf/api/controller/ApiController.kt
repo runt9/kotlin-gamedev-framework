@@ -25,12 +25,14 @@ abstract class ApiController {
     protected suspend fun <R> onRender(block: () -> R): R = renderHop(block)
 
     /**
-     * [expected] completes the sentence "is not ...", so pass a noun phrase like "a UUID".
-     *
-     * @throws ApiException 400 when the parameter is absent, and again when [parse] rejects it.
+     * @param expected completes the sentence "is not ...", so pass a noun phrase like "a UUID".
+     * @throws ApiException 400 when [parse] rejects the value.
+     * @throws IllegalStateException when the matched route declares no `{name}` placeholder.
      */
-    protected fun <T : Any> RoutingContext.pathParam(name: String, expected: String, parse: (String) -> T?): T {
-        val raw = call.pathParameters[name] ?: throw ApiException("$name was not provided", HttpStatusCode.BadRequest)
+    protected fun <T : Any> RoutingContext.pathParam(name: String, expected: String = "valid", parse: (String) -> T?): T {
+        // Not a 400: a matched route always carries its own placeholders, so absence means this name and the
+        // route template disagree. Answering the caller blames them for a wiring bug they cannot see.
+        val raw = call.pathParameters[name] ?: error("Route declares no '{$name}' placeholder")
 
         return parse(raw) ?: throw ApiException("$name '$raw' is not $expected", HttpStatusCode.BadRequest)
     }
