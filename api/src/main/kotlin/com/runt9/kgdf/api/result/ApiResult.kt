@@ -21,3 +21,12 @@ class ApiResult<T>(val currentScreen: ApiScreen, val data: T)
 object NoData
 
 suspend inline fun <reified T> ApplicationCall.respondApi(data: T) = respond(ApiResult(ApiScreen.current, data))
+
+/**
+ * Deliberately not `inline` with a `reified` type, unlike [respondApi] directly above it.
+ *
+ * It takes no type parameter, so `T` is already concretely [NoData] where [respondApi] inlines, and the
+ * `typeInfo` ContentNegotiation resolves its serializer from stays complete. Making this generic is what would
+ * erase it, and that failure lands at request time rather than compile time.
+ */
+suspend fun ApplicationCall.respondNoData() = respondApi(NoData)
