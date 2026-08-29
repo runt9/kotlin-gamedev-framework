@@ -25,10 +25,9 @@ abstract class ApiController {
     protected suspend fun <R> onRender(block: () -> R): R = renderHop(block)
 
     /**
-     * The named path parameter, parsed by [parse], or a 400 naming which half failed: absent, or unparseable.
+     * [expected] completes the sentence "is not ...", so pass a noun phrase like "a UUID".
      *
-     * [expected] completes the sentence "is not ...", so pass a noun phrase such as "a UUID". Both failures are
-     * the caller's, and telling them apart is the difference between a wrong URL and a wrong id.
+     * @throws ApiException 400 when the parameter is absent, and again when [parse] rejects it.
      */
     protected fun <T : Any> RoutingContext.pathParam(name: String, expected: String, parse: (String) -> T?): T {
         val raw = call.pathParameters[name] ?: throw ApiException("$name was not provided", HttpStatusCode.BadRequest)

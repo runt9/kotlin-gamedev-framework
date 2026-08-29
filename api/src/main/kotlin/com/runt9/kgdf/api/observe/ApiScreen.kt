@@ -25,12 +25,11 @@ interface ApiScreen {
         }
 
         /**
-         * The screen [controllerClass] serves, matched exactly rather than by [KClass.isInstance] as [of] does:
-         * this answers for a declared controller type, not for whatever object happens to be showing.
+         * The screen [controllerClass] serves. Matches the declared class exactly, where [of] matches a showing
+         * instance by [KClass.isInstance].
          *
-         * Throws where [of] answers [DefaultApiScreen.UNKNOWN], because the two answers are read in different
-         * places. An unknown screen in a response is information. An unknown screen in a *route* silently binds
-         * every one of that controller's endpoints under `/unknown`, where each 404s with nothing saying why.
+         * @throws IllegalStateException when no registered screen names it. Answering [DefaultApiScreen.UNKNOWN]
+         * here, as [of] does, would bind that controller's endpoints under `/unknown` and 404 them all.
          */
         fun forController(controllerClass: KClass<out Controller>): ApiScreen =
             screens.find { it.controller == controllerClass }

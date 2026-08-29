@@ -9,13 +9,7 @@ import io.ktor.server.routing.RoutingContext
 import kotlin.reflect.KClass
 
 abstract class ScreenApiController<T : Controller>(protected val controllerClass: KClass<T>) : ApiController() {
-    /**
-     * The path this controller's endpoints hang off, taken from the screen enum that already pairs a route with
-     * the controller serving it. Spelling it again per controller is what lets the two drift.
-     *
-     * Resolved at object initialization, which is the first time anything touches `objectInstance` -- so every
-     * screen must already be registered by then, or this throws. Register screens before controllers.
-     */
+    /** Resolved at object initialization, so register every screen before touching any controller object. */
     protected val baseRoute = "/${ApiScreen.forController(controllerClass).route}"
 
     /**
