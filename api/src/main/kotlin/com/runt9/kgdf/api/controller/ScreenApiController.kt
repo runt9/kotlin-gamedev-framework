@@ -9,7 +9,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.routing.RoutingContext
 import kotlin.reflect.KClass
 
-abstract class ScreenApiController<C : Controller>(protected val controllerClass: KClass<C>) : ApiController() {
+abstract class ScreenApiController<C>(protected val controllerClass: KClass<out Controller>) : ApiController() {
     /**
      * The screen's route, leading slash included.
      *
