@@ -25,6 +25,17 @@ interface ApiScreen {
         }
 
         /**
+         * The screen [controllerClass] serves. Matches the declared class exactly, where [of] matches a showing
+         * instance by [KClass.isInstance].
+         *
+         * @throws IllegalStateException when no registered screen names it. Answering [DefaultApiScreen.UNKNOWN]
+         * here, as [of] does, would bind that controller's endpoints under `/unknown` and 404 them all.
+         */
+        fun forController(controllerClass: KClass<out Controller>): ApiScreen =
+            screens.find { it.controller == controllerClass }
+                ?: error("No ApiScreen names ${controllerClass.simpleName}. Register screens before controllers.")
+
+        /**
          * Idempotent by identity, for the same reason as [com.runt9.kgdf.api.controller.ApiControllerRegistry]:
          * the list is process-global with no teardown, so a test JVM registering per spec must not accumulate.
          */

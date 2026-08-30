@@ -10,6 +10,15 @@ import kotlin.reflect.KClass
 
 abstract class ScreenApiController<T : Controller>(protected val controllerClass: KClass<T>) : ApiController() {
     /**
+     * The screen's route, leading slash included.
+     *
+     * Lazy so that constructing a controller does not need the screen registry. Routes are built from
+     * [register], which runs well after screens are registered, and eager resolution made merely reflecting
+     * over a subclass fatal.
+     */
+    protected val baseRoute by lazy { "/${ApiScreen.forController(controllerClass).route}" }
+
+    /**
      * Resolves the live controller and runs [block] against it, both on the rendering thread.
      *
      * Resolution is inside the hop rather than before it so the screen cannot change between the check and the
