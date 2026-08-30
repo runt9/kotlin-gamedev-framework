@@ -10,23 +10,25 @@ import com.runt9.kgdf.ui.updatable
 import com.runt9.kgdf.ui.viewModel.ViewModel
 import ktx.actors.onChange
 
+/**
+ * [bindings] must name every binding [predicate] reads. They are enumerated here rather than discovered,
+ * so one left out leaves the button in a stale disabled state with nothing to signal it.
+ */
+fun Button.bindButtonDisabled(
+    vararg bindings: ViewModel.Binding<*>,
+    evaluateOnCall: Boolean = true,
+    predicate: () -> Boolean
+) = bindUpdatables(bindings.asList(), evaluateOnCall) {
+    isDisabled = predicate()
+    touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
+}
+
+/** Disabled while [binding] holds [disabledValue]. The sentinel case of the overload above. */
 fun <T : Any> Button.bindButtonDisabled(
     binding: ViewModel.Binding<T>,
     disabledValue: T,
     evaluateOnCall: Boolean = true
-) = bindUpdatable(binding, evaluateOnCall) {
-    isDisabled = binding.get() == disabledValue
-    touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
-}
-
-fun Button.bindButtonDisabled(
-    bindings: Iterable<ViewModel.Binding<*>>,
-    evaluateOnCall: Boolean = true,
-    predicate: () -> Boolean
-) = bindUpdatables(bindings, evaluateOnCall) {
-    isDisabled = predicate()
-    touchable = if (isDisabled) Touchable.disabled else Touchable.enabled
-}
+) = bindButtonDisabled(binding, evaluateOnCall = evaluateOnCall) { binding.get() == disabledValue }
 
 fun Button.bindButtonDisabledToVmDirty(vm: ViewModel, disabledValue: Boolean, evaluateOnCall: Boolean = true) {
     bindButtonDisabled(vm.dirty, disabledValue, evaluateOnCall)
