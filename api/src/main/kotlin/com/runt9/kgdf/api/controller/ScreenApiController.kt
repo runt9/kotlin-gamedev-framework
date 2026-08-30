@@ -69,8 +69,10 @@ abstract class ScreenApiController<C : Controller>(protected val controllerClass
     protected abstract val dtoResponder: suspend RoutingContext.() -> Unit
 
     /**
-     * A value rather than a type parameter, because a `DTO` on this class would be erased and [respondApi] needs
-     * a runtime `typeInfo`. Reifying here captures it at the one call site where the type is concrete.
+     * A value rather than a type parameter: a `DTO` on this class would be erased, and [respondOnScreen] needs a
+     * reified one. Reifying here captures it where the DTO type is still concrete.
+     *
+     * [block] takes the live controller as its receiver, so a DTO cannot be built off the rendering thread.
      */
     protected inline fun <reified D> dto(crossinline block: C.() -> D): suspend RoutingContext.() -> Unit =
         { respondOnScreen { block() } }
