@@ -47,17 +47,27 @@ abstract class ScreenApiController<C>(protected val controllerClass: KClass<out 
     protected suspend inline fun <reified R> RoutingContext.respondOnScreen(noinline block: C.() -> R) =
         call.respondApi(onScreen(settle = false, block = block))
 
+    protected val controller: C get() = resolve(shownScreen())
+
+    /**
+     * What endpoints act on, given the controller that is showing. Override to serve a facade over it.
+     *
+     * The default cast is unchecked, so an override is **mandatory** whenever [C] is not [controllerClass]:
+     * without one the cast silently succeeds and the first member access throws a ClassCastException from
+     * inside a render hop, far from the declaration that caused it.
+     */
     @Suppress("UNCHECKED_CAST")
-    protected val controller: C
-        get() {
-            val shown = ShownScreen.shown() ?: throw ApiException("nothing is showing yet", statusCode = HttpStatusCode.Conflict)
+    protected open fun resolve(shown: Controller): C = shown as C
 
-            if (!controllerClass.isInstance(shown)) {
-                throw ApiException("that is not the screen showing; currently on ${ApiScreen.current.route}", statusCode = HttpStatusCode.Conflict)
-            }
+    private fun shownScreen(): Controller {
+        val shown = ShownScreen.shown() ?: throw ApiException("nothing is showing yet", statusCode = HttpStatusCode.Conflict)
 
-            return shown as C
+        if (!controllerClass.isInstance(shown)) {
+            throw ApiException("that is not the screen showing; currently on ${ApiScreen.current.route}", statusCode = HttpStatusCode.Conflict)
         }
+
+        return shown
+    }
 
     /** The write-side counterpart to [respondOnScreen]: do the thing, answer with nothing but `currentScreen`. */
     suspend fun <R> RoutingContext.respondNoDataOnScreen(block: C.() -> R) {
