@@ -19,8 +19,11 @@ internal val RENDER_TIMEOUT = 10.seconds
 /**
  * One hop onto the rendering thread, bounded. Everything the harness reads or drives goes through here, so an
  * answer cannot describe two different frames and a stalled render loop surfaces rather than hanging.
+ *
+ * Endpoints should use `ApiController.onRender` or `ScreenApiController.onScreen`. Never call this from inside
+ * another hop: it posts and suspends, so the nested call waits on a frame the outer block is holding.
  */
-internal suspend fun <T> renderHop(block: () -> T): T = withTimeout(RENDER_TIMEOUT) { onRenderingThread { block() } }
+suspend fun <T> renderHop(block: () -> T): T = withTimeout(RENDER_TIMEOUT) { onRenderingThread { block() } }
 
 /**
  * Which screen the player is on. **Screen here means screen or topmost open dialog**, which is what a player

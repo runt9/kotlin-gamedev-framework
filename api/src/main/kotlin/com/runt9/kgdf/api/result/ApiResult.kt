@@ -1,7 +1,7 @@
 package com.runt9.kgdf.api.result
 
 import com.runt9.kgdf.api.observe.ApiScreen
-import com.runt9.kgdf.api.observe.ShownScreen
+import com.runt9.kgdf.api.observe.renderHop
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.response.respond
 import kotlinx.serialization.Serializable
@@ -20,7 +20,8 @@ class ApiResult<T>(val currentScreen: ApiScreen, val data: T)
 @Serializable
 object NoData
 
-suspend inline fun <reified T> ApplicationCall.respondApi(data: T) = respond(ApiResult(ApiScreen.current, data))
+/** Hops to read [ApiScreen.current], which walks Scene2D, so never call this from inside another hop. */
+suspend inline fun <reified T> ApplicationCall.respondApi(data: T) = respond(ApiResult(renderHop { ApiScreen.current }, data))
 
 /**
  * Deliberately not `inline` with a `reified` type, unlike [respondApi] directly above it.
