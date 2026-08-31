@@ -20,8 +20,11 @@ internal val RENDER_TIMEOUT = 10.seconds
  * One hop onto the rendering thread, bounded. Everything the harness reads or drives goes through here, so an
  * answer cannot describe two different frames and a stalled render loop surfaces rather than hanging.
  *
- * Endpoints should use `ApiController.onRender` or `ScreenApiController.onScreen`. Never call this from inside
- * another hop: it posts and suspends, so the nested call waits on a frame the outer block is holding.
+ * Endpoints should use `ApiController.onRender` or `ScreenApiController.onScreen`.
+ *
+ * Nesting one hop inside another would deadlock until the timeout, because this posts and suspends and the inner
+ * call would wait on a frame the outer block still holds. Both wrappers take a non-suspend block, so that cannot
+ * be written — keep it that way. Give either one a suspend block and the deadlock becomes reachable.
  */
 suspend fun <T> renderHop(block: () -> T): T = withTimeout(RENDER_TIMEOUT) { onRenderingThread { block() } }
 

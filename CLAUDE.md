@@ -12,6 +12,7 @@ It is relevance-triggered: check it before reading code on a topic it covers, an
 - `domains/interception/overview.md` — hooks, contexts, exact-class matching, holders
 - `domains/event-and-state/overview.md` — EventBus, the named single-thread contexts, `GameStateService`
 - `domains/view-binding/overview.md` — `ViewModel.Binding`, `Updatable`, the binding helpers
+- `domains/api-harness/overview.md` — the development HTTP harness: controllers, the screen registry, the render-thread hop
 
 Two things bind:
 

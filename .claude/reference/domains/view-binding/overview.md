@@ -7,9 +7,9 @@ verified: 2026-08-13
 branch: master
 coverage: partial
 sources:
-  - src/main/kotlin/com/runt9/kgdf/ui/viewModel/ViewModel.kt
-  - src/main/kotlin/com/runt9/kgdf/ui/Updatable.kt
-  - src/main/kotlin/com/runt9/kgdf/ext/ui/BindingExt.kt
+  - core/src/main/kotlin/com/runt9/kgdf/ui/viewModel/ViewModel.kt
+  - core/src/main/kotlin/com/runt9/kgdf/ui/Updatable.kt
+  - core/src/main/kotlin/com/runt9/kgdf/ext/ui/BindingExt.kt
 ---
 
 # View Binding
@@ -38,3 +38,4 @@ How a `ViewModel` field notifies the UI when it changes. Read this before conclu
 ## Relations
 
 - see_also [[Interception]]
+- see_also [[Development API Harness]]
