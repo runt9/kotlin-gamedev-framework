@@ -2,7 +2,7 @@
 title: Reference Knowledge Base
 type: note
 permalink: readme
-tags: [meta, conventions]
+tags: [ meta, conventions ]
 ---
 
 # Reference Knowledge Base
@@ -85,9 +85,11 @@ sources:
 One paragraph on what this note is for.
 
 ## Observations
+
 - [category] A single indexable fact #tag (optional context)
 
 ## Relations
+
 - relation_type [[Other Note]]
 ```
 
@@ -134,11 +136,11 @@ Then run `--stale`. If it reports nothing, the note describes code that has not 
 
 **`permalink` is the file path under `.claude/reference/`, minus the `.md`, with the `domains/` prefix dropped.** `domains/` is the default namespace and is elided; `projects/` is kept, so a permalink tells you which kind of note you are looking at.
 
-| File | Permalink |
-|---|---|
-| `domains/<area>/overview.md` | `<area>/overview` |
-| `domains/<area>/<subarea>/<topic>.md` | `<area>/<subarea>/<topic>` |
-| `entities/<kind>/<slug>.md` | `entities/<kind>/<slug>` |
+| File                                        | Permalink                                |
+|---------------------------------------------|------------------------------------------|
+| `domains/<area>/overview.md`                | `<area>/overview`                        |
+| `domains/<area>/<subarea>/<topic>.md`       | `<area>/<subarea>/<topic>`               |
+| `entities/<kind>/<slug>.md`                 | `entities/<kind>/<slug>`                 |
 | `projects/<ticket-or-incident>/overview.md` | `projects/<ticket-or-incident>/overview` |
 
 A permalink must stay stable if the file moves, so prefer renaming the file to changing the permalink.
@@ -238,16 +240,16 @@ That is also why **unknown frontmatter keys are a hard error**. Adding a key to 
 
 ## Observation categories in use
 
-| Category | Means |
-|---|---|
-| `[fact]` | Verified by reading code, or measured. Safe to act on. |
-| `[trap]` | True and counter-intuitive. The thing that burns an hour if unknown. |
-| `[invariant]` | Holds today, and code depends on it holding. Breaking it breaks something distant. |
-| `[risk]` | Plausible hazard, not demonstrated. |
-| `[question]` | Genuinely open. |
-| `[decision]` | A choice made deliberately, with the reasoning. |
-| `[history]` | Why it is this way, usually a ticket or commit. |
-| `[status]` | Where a piece of time-bound work currently stands. `projects/` notes only — a `domains/` note describing the code should not have a status. |
+| Category      | Means                                                                                                                                       |
+|---------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `[fact]`      | Verified by reading code, or measured. Safe to act on.                                                                                      |
+| `[trap]`      | True and counter-intuitive. The thing that burns an hour if unknown.                                                                        |
+| `[invariant]` | Holds today, and code depends on it holding. Breaking it breaks something distant.                                                          |
+| `[risk]`      | Plausible hazard, not demonstrated.                                                                                                         |
+| `[question]`  | Genuinely open.                                                                                                                             |
+| `[decision]`  | A choice made deliberately, with the reasoning.                                                                                             |
+| `[history]`   | Why it is this way, usually a ticket or commit.                                                                                             |
+| `[status]`    | Where a piece of time-bound work currently stands. `projects/` notes only — a `domains/` note describing the code should not have a status. |
 
 ## Inline tags in use
 
@@ -255,13 +257,13 @@ The full observation grammar is `- [category] content #tag (optional context)`. 
 
 This is a starter vocabulary. It is deliberately small and language-agnostic; a project earns its own tags as described in the rules below.
 
-| Tag | Means | Why it exists |
-|---|---|---|
-| `#silent-failure` | Something is discarded, swallowed or short-circuited without an error surfacing. | Usually the most expensive class of behaviour in any codebase, and the one least likely to be found by reading a single file. A wrong answer arrives looking exactly like a finished one. |
-| `#irreversible` | If this goes wrong, it cannot be fixed forward. | Highest-stakes tag: an agent proposing a change should search it first. Data destroyed on upgrade, a merge that cannot be undone, a counter that cannot be recomputed. |
-| `#order-dependent` | Sequence is load-bearing and reordering breaks something distant. | The dependency is invisible at the call site, so it survives refactoring only if it is written down. |
-| `#measured` | Established by measuring real data, not by reading code. | `[fact]` deliberately covers both, and they decay differently: code-reading rots when the code changes, measurements rot when the data does. This tag splits them. |
-| `#ABC-nnnn` | Cross-reference to a ticket, e.g. `#ABC-1234`. | An open but well-formed namespace, accepted by pattern rather than listed. Makes "what do we know about ABC-1234" a query instead of a grep. Replace `ABC` with this project's real prefix in prose; the validator accepts any `<UPPERCASE>-<digits>` shape. |
+| Tag                | Means                                                                            | Why it exists                                                                                                                                                                                                                                                |
+|--------------------|----------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `#silent-failure`  | Something is discarded, swallowed or short-circuited without an error surfacing. | Usually the most expensive class of behaviour in any codebase, and the one least likely to be found by reading a single file. A wrong answer arrives looking exactly like a finished one.                                                                    |
+| `#irreversible`    | If this goes wrong, it cannot be fixed forward.                                  | Highest-stakes tag: an agent proposing a change should search it first. Data destroyed on upgrade, a merge that cannot be undone, a counter that cannot be recomputed.                                                                                       |
+| `#order-dependent` | Sequence is load-bearing and reordering breaks something distant.                | The dependency is invisible at the call site, so it survives refactoring only if it is written down.                                                                                                                                                         |
+| `#measured`        | Established by measuring real data, not by reading code.                         | `[fact]` deliberately covers both, and they decay differently: code-reading rots when the code changes, measurements rot when the data does. This tag splits them.                                                                                           |
+| `#ABC-nnnn`        | Cross-reference to a ticket, e.g. `#ABC-1234`.                                   | An open but well-formed namespace, accepted by pattern rather than listed. Makes "what do we know about ABC-1234" a query instead of a grep. Replace `ABC` with this project's real prefix in prose; the validator accepts any `<UPPERCASE>-<digits>` shape. |
 
 Rules, because an uncontrolled tag namespace is worse than none:
 
@@ -319,6 +321,8 @@ Use `_legacy/` or `_superseded/` for a document kept only until its content is e
 - [[View Binding]] — `ViewModel.Binding`, `Updatable`, and the binding helpers.
 - [[Logging]] — `kgdfLogger`, levels, the swappable sink, and how tests capture output. Read before adding a
   log call in a hot path.
+- [[Development API Harness]] — the `api` module: the render-thread hop every endpoint must cross, screen
+  resolution, the response envelope, and the reified-type constraint on responding.
 
 ## Relations
 

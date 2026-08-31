@@ -7,11 +7,11 @@ verified: 2026-08-13
 branch: master
 coverage: partial
 sources:
-  - src/main/kotlin/com/runt9/kgdf/intercept/Interceptor.kt
-  - src/main/kotlin/com/runt9/kgdf/intercept/InterceptableContext.kt
-  - src/main/kotlin/com/runt9/kgdf/intercept/InterceptorHolder.kt
-  - src/main/kotlin/com/runt9/kgdf/intercept/InterceptorHook.kt
-  - src/main/kotlin/com/runt9/kgdf/intercept/OnChangeInterceptable.kt
+  - core/src/main/kotlin/com/runt9/kgdf/intercept/Interceptor.kt
+  - core/src/main/kotlin/com/runt9/kgdf/intercept/InterceptableContext.kt
+  - core/src/main/kotlin/com/runt9/kgdf/intercept/InterceptorHolder.kt
+  - core/src/main/kotlin/com/runt9/kgdf/intercept/InterceptorHook.kt
+  - core/src/main/kotlin/com/runt9/kgdf/intercept/OnChangeInterceptable.kt
 ---
 
 # Interception

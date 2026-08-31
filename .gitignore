@@ -1,8 +1,11 @@
 /.idea
-/.gradle
 *.iml
-# Project exclude paths
-/build
+# Not root-anchored: a leading slash ignores only the root's build output and commits every module's.
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
 .agentbridge
 out/
 

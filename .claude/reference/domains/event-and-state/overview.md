@@ -7,18 +7,18 @@ verified: 2026-08-15
 branch: testability-and-testing-refactor
 coverage: partial
 sources:
-  - src/main/kotlin/com/runt9/kgdf/event/EventBus.kt
-  - src/main/kotlin/com/runt9/kgdf/event/EventHandler.kt
-  - src/main/kotlin/com/runt9/kgdf/async/WorkSource.kt
-  - src/main/kotlin/com/runt9/kgdf/async/WorkTracker.kt
-  - src/main/kotlin/com/runt9/kgdf/async/AsyncWorkQueue.kt
-  - src/main/kotlin/com/runt9/kgdf/async/CombinedWorkSource.kt
-  - src/main/kotlin/com/runt9/kgdf/service/GameStateService.kt
-  - src/main/kotlin/com/runt9/kgdf/service/GameService.kt
-  - src/main/kotlin/com/runt9/kgdf/service/GameServiceRegistry.kt
-  - src/main/kotlin/com/runt9/kgdf/service/GameInitializer.kt
-  - src/main/kotlin/com/runt9/kgdf/service/ServiceAsync.kt
-  - src/main/kotlin/com/runt9/kgdf/async/AsyncFactory.kt
+  - core/src/main/kotlin/com/runt9/kgdf/event/EventBus.kt
+  - core/src/main/kotlin/com/runt9/kgdf/event/EventHandler.kt
+  - core/src/main/kotlin/com/runt9/kgdf/async/WorkSource.kt
+  - core/src/main/kotlin/com/runt9/kgdf/async/WorkTracker.kt
+  - core/src/main/kotlin/com/runt9/kgdf/async/AsyncWorkQueue.kt
+  - core/src/main/kotlin/com/runt9/kgdf/async/CombinedWorkSource.kt
+  - core/src/main/kotlin/com/runt9/kgdf/service/GameStateService.kt
+  - core/src/main/kotlin/com/runt9/kgdf/service/GameService.kt
+  - core/src/main/kotlin/com/runt9/kgdf/service/GameServiceRegistry.kt
+  - core/src/main/kotlin/com/runt9/kgdf/service/GameInitializer.kt
+  - core/src/main/kotlin/com/runt9/kgdf/service/ServiceAsync.kt
+  - core/src/main/kotlin/com/runt9/kgdf/async/AsyncFactory.kt
 ---
 
 # Events, Async and State
@@ -63,9 +63,9 @@ flowchart LR
         flow --> isIdle["isIdle — plain read"]
         flow --> pending["pending — StateFlow"]
     end
-    submit -- "1. count up, before dispatch" --> enter
-    handle -- "3. count down, after handling" --> exit
-    handle -. "2. handling may submit more work —<br/>that enter lands before this exit,<br/>so the count never reaches zero between them" .-> submit
+    submit -- " 1. count up, before dispatch " --> enter
+    handle -- " 3. count down, after handling " --> exit
+    handle -. " 2. handling may submit more work —<br/>that enter lands before this exit,<br/>so the count never reaches zero between them " .-> submit
     pending -.-> combined["CombinedWorkSource<br/>combine(N).sum()"]
     isIdle -.-> combined
 ```
@@ -108,3 +108,4 @@ flowchart LR
 
 - see_also [[Interception]]
 - see_also [[Logging]]
+- see_also [[Development API Harness]]

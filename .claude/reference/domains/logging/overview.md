@@ -2,19 +2,19 @@
 title: Logging
 type: note
 permalink: logging/overview
-tags: [logging, testing, settings]
+tags: [ logging, testing, settings ]
 verified: 2026-08-14
 branch: testability-and-testing-refactor
 coverage: partial
 sources:
-  - src/main/kotlin/com/runt9/kgdf/log/Logger.kt
-  - src/main/kotlin/com/runt9/kgdf/log/LogLevel.kt
-  - src/main/kotlin/com/runt9/kgdf/log/LogSink.kt
-  - src/main/kotlin/com/runt9/kgdf/log/KgdfLog.kt
-  - src/main/kotlin/com/runt9/kgdf/log/KotlinLoggingLogger.kt
-  - src/main/kotlin/com/runt9/kgdf/application/ApplicationInitializer.kt
-  - src/main/kotlin/com/runt9/kgdf/settings/PlayerSettings.kt
-  - src/testFixtures/kotlin/com/runt9/kgdf/testsupport/CapturingSink.kt
+  - core/src/main/kotlin/com/runt9/kgdf/log/Logger.kt
+  - core/src/main/kotlin/com/runt9/kgdf/log/LogLevel.kt
+  - core/src/main/kotlin/com/runt9/kgdf/log/LogSink.kt
+  - core/src/main/kotlin/com/runt9/kgdf/log/KgdfLog.kt
+  - core/src/main/kotlin/com/runt9/kgdf/log/KotlinLoggingLogger.kt
+  - core/src/main/kotlin/com/runt9/kgdf/application/ApplicationInitializer.kt
+  - core/src/main/kotlin/com/runt9/kgdf/settings/PlayerSettings.kt
+  - core/src/testFixtures/kotlin/com/runt9/kgdf/testsupport/CapturingSink.kt
 ---
 
 # Logging
