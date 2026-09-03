@@ -3,8 +3,8 @@ title: Events, Async and State
 type: note
 permalink: event-and-state/overview
 tags: [ eventbus, async, state, persistence ]
-verified: 2026-08-15
-branch: testability-and-testing-refactor
+verified: 2026-09-02
+branch: master
 coverage: partial
 sources:
   - core/src/main/kotlin/com/runt9/kgdf/event/EventBus.kt
@@ -19,11 +19,13 @@ sources:
   - core/src/main/kotlin/com/runt9/kgdf/service/GameInitializer.kt
   - core/src/main/kotlin/com/runt9/kgdf/service/ServiceAsync.kt
   - core/src/main/kotlin/com/runt9/kgdf/async/AsyncFactory.kt
+  - core/src/testFixtures/kotlin/com/runt9/kgdf/testsupport/TestAsyncFactory.kt
+  - core/src/test/kotlin/com/runt9/kgdf/async/AsyncWorkQueueTest.kt
 ---
 
 # Events, Async and State
 
-> **Incomplete and permanently WIP.** These notes record what has been investigated, not what exists. Anything not mentioned here is almost certainly "not looked at yet" rather than "not there" or "not a problem". `EventBus`, `EventHandler`, `WorkSource`, `WorkTracker`, `AsyncWorkQueue`, `CombinedWorkSource`, `GameStateService`, `GameService`, `GameServiceRegistry`, `GameInitializer`, `ServiceAsync` and `AsyncFactory` were read in full. Not covered: `SingleFileSaveStateService` (the actual disk format and write path — only its call sites here were read), `Event`/`GameEvents`, and how any consuming project names or uses its own additional threads.
+> **Incomplete and permanently WIP.** These notes record what has been investigated, not what exists. Anything not mentioned here is almost certainly "not looked at yet" rather than "not there" or "not a problem". `EventBus`, `EventHandler`, `WorkSource`, `WorkTracker`, `AsyncWorkQueue`, `CombinedWorkSource`, `GameStateService`, `GameService`, `GameServiceRegistry`, `GameInitializer`, `ServiceAsync` and `AsyncFactory` were read in full. Not covered: `SingleFileSaveStateService` (the actual disk format and write path — only its call sites here were read), `Event`/`GameEvents`, and how any consuming project names or uses its own additional threads. The 2026-09-02 pass re-read only `GameStateService`, `AsyncFactory`, `TestAsyncFactory` and `AsyncWorkQueueTest`; everything in the EventBus, work-tracking and GameService-lifecycle sections is carried forward from the 2026-08-15 pass unverified.
 
 Four coupled concerns: how events are dispatched, how outstanding work is counted so a caller can tell when things have settled, which named thread work lands on, and how game state is loaded, mutated and persisted. Read this before writing an event handler, before implementing `WorkSource` on anything, before choosing between `update` and `updateAsync`, and before assuming a `save` actually wrote anything.
 
@@ -93,15 +95,21 @@ flowchart LR
 
 - [fact] `AsyncFactory.newAsyncContext(name)` returns `newSingleThreadAsyncContext(name)` — every context it hands out is a single thread. It is `open`, so tests can substitute a deterministic scheduler.
 - [fact] `ServiceAsync` owns a single thread named `Service-Thread`, exposed as `launchOnServiceThread` (fire and forget) and `onServiceThread` (suspending `withContext`). It is an injected class taking an [AsyncFactory], not an object, so a test can substitute a scheduler and drain it.
+- [fact] `TestAsyncFactory` (in `core`'s `testFixtures`) is the substitution point: it overrides `newAsyncContext` to return a `StandardTestDispatcher` bound to the test's `TestCoroutineScheduler`, so every kgdfw context becomes drainable from the test rather than a real thread.
+- [trap] `StandardTestDispatcher` does **not** run a coroutine eagerly on launch — the work queues until the scheduler is advanced. A test that submits work and asserts without calling `advanceUntilIdle()` sees nothing happen, and the failure reads as broken production code rather than a missing line in the test #silent-failure.
+- [fact] `AsyncWorkQueueTest` uses that gap deliberately in "submit counts the item before the handler has run": it submits, does not advance, and asserts the handler list is still empty. Skipping the advance is a real assertion tool, not only an omission.
+- [invariant] The substitution only reaches contexts created through `AsyncFactory`, which is why `AsyncFactory` is the sole caller of `newSingleThreadAsyncContext` in kgdfw. A context constructed directly runs on a real thread no scheduler can drain, and a test seeing stale state afterward is hitting that gap rather than a framework bug #order-dependent.
 - [decision] **Finding no callers for `ServiceAsync` or `updateAsync` is expected and is not grounds for deleting them.** Turn-based consumers have nothing to put on a background service thread, because everything they do is reachable from the render loop. Real-time consumers are what it exists for. This has been proposed for deletion once on a zero-callers argument; the answer is no.
 
 ### GameStateService
 
 - [trap] `load()` returns `gameState.clone()`, **not** the cached instance. Mutating what `load()` gave you changes nothing until `save()` — except for whatever the consumer's `clone()` leaves shallow, which is visible immediately and permanently.
-- [trap] `save(state, forceUpdate = false)` **silently does nothing** when the state is already initialised, `forceUpdate` is false, and `state == cachedState`. Whether a mutation is detected therefore depends entirely on the consumer's `equals` #silent-failure. If a mutable object inside the state has identity-ish equality, mutating it is invisible here and the write is dropped — pass `forceUpdate = true` on any path that mutates such an object.
+- [trap] `save(state, forceUpdate = false)` **silently does nothing** when the state is already initialized, `forceUpdate` is false, and `state == cachedState`. Whether a mutation is detected therefore depends entirely on the consumer's `equals` #silent-failure. If a mutable object inside the state has identity-ish equality, mutating it is invisible here and the write is dropped — pass `forceUpdate = true` on any path that mutates such an object.
 - [fact] `update(forceUpdate) { }` is **fully synchronous**: it is `load().apply { update(); save(this, forceUpdate) }`, running on the calling thread and returning after the save.
 - [fact] `updateAsync(forceUpdate) { }` is the same call wrapped in the injected `ServiceAsync.launchOnServiceThread`, i.e. fire-and-forget on `Service-Thread`. Because that context now comes from `AsyncFactory`, a test scheduler drains it like any other.
-- [fact] `save` enqueues the consumer's `updatedEvent(clone)` onto the EventBus before writing to disk.
+- [fact] `save` enqueues the consumer's `updatedEvent(clone)` onto the EventBus before writing to disk. It is the only place the framework fires that event, so **every** persisted mutation announces itself and a handler is a general "state changed" hook rather than a per-call-site one.
+- [trap] That `enqueueEvent` sits **inside** the same guard as the write, so the no-op save fires no event at all: a mutation the consumer's `equals` cannot see is dropped silently *and* nothing downstream is told. A binding or handler waiting on `updatedEvent` therefore just never updates, with no failed write to notice — `forceUpdate = true` is what fixes both halves at once #silent-failure.
+- [trap] The event is enqueued *before* `stateService.saveState`, and `enqueueEvent` returns immediately, so a handler can observe the new state while the disk write is still in flight or has yet to begin. Never treat receiving the update event as proof the save file is on disk #order-dependent.
 - [fact] `load()` initialises from `stateService.loadState()` when a save file exists, otherwise builds `initNewState()` and immediately saves it.
 
 ## Relations
