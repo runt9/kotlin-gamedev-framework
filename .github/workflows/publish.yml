@@ -1,0 +1,33 @@
+name: Publish
+
+# The tag is the version. gradle.properties carries a version too, but it is only the default for local builds --
+# what ships is whatever the tag says, so the two cannot disagree in a published artifact.
+on:
+  push:
+    tags: ['*.*.*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    # packages:write is the whole point of publishing from here: the token exists for one run and nothing
+    # write-capable has to sit in a developer's gradle.properties.
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v6
+
+      - run: ./gradlew -Pversion="${{ github.ref_name }}" publish
+        env:
+          # Read by the GitHubPackages repository in kgdfw-common-plugin.gradle.kts. GITHUB_ACTOR is set by the
+          # runner already, so only the token needs passing.
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
