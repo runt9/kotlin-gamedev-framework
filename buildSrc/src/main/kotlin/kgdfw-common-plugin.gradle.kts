@@ -75,6 +75,23 @@ tasks.jar {
 }
 
 publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = uri("https://maven.pkg.github.com/Runt9-Productions/kotlin-gamedev-framework")
+
+            // gpr.key must be a CLASSIC token. The Maven registry rejects fine-grained ones with a 401, which
+            // reads as a wrong password rather than as an unsupported token type. In Actions the built-in
+            // GITHUB_TOKEN works instead, but only once the consuming repo is granted read access to the package.
+            credentials {
+                username = providers.gradleProperty("gpr.user")
+                    .orElse(providers.environmentVariable("GITHUB_ACTOR")).orNull
+                password = providers.gradleProperty("gpr.key")
+                    .orElse(providers.environmentVariable("GITHUB_TOKEN")).orNull
+            }
+        }
+    }
+
     publications {
         create<MavenPublication>("maven") {
             artifactId = project.name
