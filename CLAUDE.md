@@ -46,5 +46,5 @@ These are the framework's highest-cost surprises, kept here in one line each so 
 ## Working here
 
 - This framework is solely owned and maintained by the same person who owns RogueFlip. It is not off-limits: changes and improvements are welcome, and it is easy to test and deploy.
-- Consumers pin kgdfw by JitPack version tag. A change here is not live in a consumer until a new semver tag is pushed and the consumer's pin is bumped to it; `mavenLocal` plus the `kgdfVersion` property is the local iteration path. Releasing is a `git tag` plus push — JitPack builds the tag the first time anything resolves it, which takes a few minutes.
+- Consumers pin kgdfw by JitPack version tag. A change here is not live in a consumer until a new semver tag is pushed and the consumer's pin is bumped to it. A consumer iterates locally with `-PuseLocalKgdfw=true`, which composite-builds this checkout in place of the published artifact; the older `mavenLocal` plus `kgdfVersion` path was removed in 2026-08. Releasing is a `git tag` plus push — JitPack builds the tag the first time anything resolves it, which takes a few minutes.
 - Because there is exactly one consumer today, "nothing calls this" is cheap to establish and worth recording when you find it — several APIs here are dead rather than dangerous.
