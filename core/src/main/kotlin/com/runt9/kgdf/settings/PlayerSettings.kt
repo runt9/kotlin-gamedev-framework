@@ -2,6 +2,7 @@ package com.runt9.kgdf.settings
 
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration
 import com.runt9.kgdf.log.LogLevel
+import com.runt9.kgdf.log.kgdfLogger
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -24,13 +25,25 @@ abstract class PlayerSettings {
     }
 
     companion object {
+        private val logger = kgdfLogger()
+
+        /** Every mode the settings UI offers is at least this large, so it is a safe floor rather than a guess. */
+        private val HEADLESS_RESOLUTION = Resolution(1280, 720, 60)
+
+        /** Reads the primary display mode, falling back to [HEADLESS_RESOLUTION] where there is no display. */
         fun defaultPlayerSettings(): PlayerSettings {
-            val primaryDisplayMode = Lwjgl3ApplicationConfiguration.getDisplayMode()
+            val defaultResolution = try {
+                Lwjgl3ApplicationConfiguration.getDisplayMode().let { Resolution(it.width, it.height, it.refreshRate) }
+            } catch (e: Exception) {
+                logger.warn(e) { "No display available, defaulting resolution to $HEADLESS_RESOLUTION" }
+                HEADLESS_RESOLUTION
+            }
+
             return object : PlayerSettings() {
                 override val fullscreen = false
                 override val vsync = true
                 override val minLogLevel = LogLevel.ERROR
-                override val resolution = Resolution(primaryDisplayMode.width, primaryDisplayMode.height, primaryDisplayMode.refreshRate)
+                override val resolution = defaultResolution
                 override val uiScale = 1f
                 override val mainVolume = 0.2f
                 override val soundVolume = 1f
