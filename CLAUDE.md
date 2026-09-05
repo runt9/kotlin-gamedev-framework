@@ -13,6 +13,8 @@ It is relevance-triggered: check it before reading code on a topic it covers, an
 - `domains/event-and-state/overview.md` — EventBus, the named single-thread contexts, `GameStateService`
 - `domains/view-binding/overview.md` — `ViewModel.Binding`, `Updatable`, the binding helpers
 - `domains/api-harness/overview.md` — the development HTTP harness: controllers, the screen registry, the render-thread hop
+- `domains/headless/overview.md` — why "no LibGDX `Application`" is not the same as headless, and which calls still need a display
+- `domains/build-and-release/overview.md` — publishing to GitHub Packages, and the rule that the tag is the version
 
 Two things bind:
 

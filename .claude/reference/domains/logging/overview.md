@@ -65,3 +65,4 @@ Logging does **not** go through LibGDX. `Logger` is kgdfw's own, writing to a sw
 ## Relations
 
 - see_also [[Events, Async and State]]
+- see_also [[Running Without a Display]]
