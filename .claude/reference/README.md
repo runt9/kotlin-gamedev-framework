@@ -323,6 +323,10 @@ Use `_legacy/` or `_superseded/` for a document kept only until its content is e
   log call in a hot path.
 - [[Development API Harness]] — the `api` module: the render-thread hop every endpoint must cross, screen
   resolution, the response envelope, and the reified-type constraint on responding.
+- [[Running Without a Display]] — why "no LibGDX `Application`" is not the same as headless, and the static
+  call that needs a windowing system anyway. Read before assuming a consumer can run display-less.
+- [[Build and Release]] — publishing to GitHub Packages: the tag is the version, the credential shape, and
+  why a version appearing in the API does not mean the publish finished.
 
 ## Relations
 
